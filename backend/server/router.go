@@ -14,5 +14,8 @@ func SetupRouter() *gin.Engine {
 	// Ping test
 	r.GET("/ping", handlers.PingHandler)
 
+	// Routes for Post functions
+	r.GET("/posts", handlers.GetPostList)
+
 	return r
 }
