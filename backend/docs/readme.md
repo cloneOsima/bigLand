@@ -49,3 +49,4 @@ create table post (
 - https://pkg.go.dev/github.com/jackc/pgx/v5/pgxpool
 - https://github.com/jackc/pgx/wiki/Getting-started-with-pgx
 - https://medium.com/@neelkanthsingh.jr/understanding-database-connection-pools-and-the-pgx-library-in-go-3087f3c5a0c
+- https://medium.com/@lhc1990/solving-supabase-ipv6-connection-issues-the-complete-developers-guide-96f8481f42c1    // recommend to read it!

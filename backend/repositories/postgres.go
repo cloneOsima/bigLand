@@ -65,13 +65,10 @@ func CloseDB() {
 	}
 }
 
-func GetEntirePost() ([]models.EntirePost, error) {
+func GetEntirePost(dbCtx context.Context) ([]models.EntirePost, error) {
 	if dbPool == nil {
 		return nil, fmt.Errorf("database pool is not initialized")
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
 
 	query := `
 		SELECT
@@ -83,7 +80,7 @@ func GetEntirePost() ([]models.EntirePost, error) {
 	`
 
 	// use .Query function for read every rows (single row needs .QueryRow())
-	rows, err := dbPool.Query(ctx, query)
+	rows, err := dbPool.Query(dbCtx, query)
 	if err != nil {
 		log.Printf("Errors: Query failed: %v", err)
 		return nil, err
