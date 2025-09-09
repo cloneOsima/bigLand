@@ -13,11 +13,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Handler interface {
+	GetPosts(c *gin.Context)
+}
+
+type handlerImpl struct {
+	postSvc services.PostService
+}
+
+func NewHandler(postSvc services.PostService) Handler {
+	return &handlerImpl{
+		postSvc: postSvc,
+	}
+}
+
 func PingHandler(c *gin.Context) {
 	c.String(http.StatusOK, "pong")
 }
 
-func GetPostList(c *gin.Context) {
+func (h *handlerImpl) GetPosts(c *gin.Context) {
 
 	reqId := c.GetHeader("X-Request-ID")
 	if reqId == "" {
@@ -29,7 +43,7 @@ func GetPostList(c *gin.Context) {
 	ctx = context.WithValue(ctx, "requestId", reqId)
 	defer cancle()
 
-	result, err := services.GetPostList(ctx)
+	result, err := h.postSvc.GetPosts(ctx)
 	if err != nil {
 		log.Printf("GetPostList failed - Request Id: %s, Error, %v", reqId, err)
 

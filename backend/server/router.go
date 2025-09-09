@@ -8,14 +8,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter() *gin.Engine {
+func SetupRouter(h handlers.Handler) *gin.Engine {
 	r := gin.Default()
 
-	// Ping test
 	r.GET("/ping", handlers.PingHandler)
-
-	// Routes for Post functions
-	r.GET("/posts", handlers.GetPostList)
+	r.GET("/posts", h.GetPosts)
 
 	return r
 }
