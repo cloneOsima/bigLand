@@ -38,7 +38,7 @@ CREATE TABLE posts (
     incident_date DATE NOT NULL,
     posted_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     latitude DOUBLE PRECISION NOT NULL,
-    longitude DOUBLE PRECISION NOT NULL,
+    longtitude DOUBLE PRECISION NOT NULL,
     address_text TEXT,
     location GEOMETRY(Point, 4326) NOT NULL,
     is_active BOOLEAN DEFAULT TRUE
