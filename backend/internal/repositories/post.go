@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/cloneOsima/bigLand/backend/models"
+	"github.com/cloneOsima/bigLand/backend/internal/models"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

@@ -6,8 +6,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/cloneOsima/bigLand/backend/models"
-	"github.com/cloneOsima/bigLand/backend/repositories"
+	"github.com/cloneOsima/bigLand/backend/internal/models"
+	"github.com/cloneOsima/bigLand/backend/internal/repositories"
 )
 
 type PostService interface {

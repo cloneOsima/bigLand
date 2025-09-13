@@ -1,3 +1,12 @@
+# Required functions
+- get post list (50 limit)
+- get post info
+- create a new post
+- comment
+- delete post (admin)
+- delete comment (admin)
+- create a new account
+
 # 新着情報 read function requirements
 
 ## Required dataset
