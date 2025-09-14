@@ -59,13 +59,13 @@ func TestGetPosts(t *testing.T) {
 			mockRepo.On("GetPosts", mock.Anything).Return(tc.mockReturn, tc.mockError)
 
 			postService := services.NewPostService(mockRepo)
-			posts, err := postService.GetPosts(context.Background())
+			result, err := postService.GetPosts(context.Background())
 
 			if (err != nil && tc.expectErr == nil) || (err == nil && tc.expectErr != nil) || (err != nil && err.Error() != tc.expectErr.Error()) {
 				t.Errorf("예상 에러: '%v', 실제 에러: '%v'", tc.expectErr, err)
 			}
-			if len(posts) != len(tc.expectPosts) {
-				t.Errorf("반환된 게시물 수가 다름. 예상: %d, 실제: %d", len(tc.expectPosts), len(posts))
+			if len(result) != len(tc.expectPosts) {
+				t.Errorf("반환된 게시물 수가 다름. 예상: %d, 실제: %d", len(tc.expectPosts), len(result))
 			}
 		})
 	}
