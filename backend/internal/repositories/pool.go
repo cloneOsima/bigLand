@@ -1,4 +1,4 @@
-package main
+package repositories
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 var dbPool *pgxpool.Pool
 
 // 서버 셋업 시 tracnsaction pool 생성
-func initConnectionPool() (*pgxpool.Pool, error) {
+func InitPool() (*pgxpool.Pool, error) {
 	err := godotenv.Load("configs/postgresql.env")
 	if err != nil {
 		log.Fatalf("Errors: Failed to load postgresql.env file")
@@ -58,7 +58,7 @@ func initConnectionPool() (*pgxpool.Pool, error) {
 }
 
 // 서버 종료 시 connection pool 제거
-func deleteConnectionPool() {
+func DropPool() {
 	if dbPool != nil {
 		dbPool.Close()
 	}

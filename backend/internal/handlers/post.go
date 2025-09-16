@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cloneOsima/bigLand/backend/services"
-	"github.com/cloneOsima/bigLand/backend/utils"
+	"github.com/cloneOsima/bigLand/backend/internal/services"
+	"github.com/cloneOsima/bigLand/backend/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,7 +21,7 @@ type handlerImpl struct {
 	postSvc services.PostService
 }
 
-func NewHandler(postSvc services.PostService) Handler {
+func NewPostHandler(postSvc services.PostService) Handler {
 	return &handlerImpl{
 		postSvc: postSvc,
 	}

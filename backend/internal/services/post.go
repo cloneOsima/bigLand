@@ -6,12 +6,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/cloneOsima/bigLand/backend/models"
-	"github.com/cloneOsima/bigLand/backend/repositories"
+	"github.com/cloneOsima/bigLand/backend/internal/models"
+	"github.com/cloneOsima/bigLand/backend/internal/repositories"
 )
 
 type PostService interface {
-	GetPosts(ctx context.Context) ([]models.EntirePost, error)
+	GetPosts(ctx context.Context) ([]models.Posts, error)
 }
 
 type postServiceImpl struct {
@@ -22,7 +22,7 @@ func NewPostService(repo repositories.PostRepository) PostService {
 	return &postServiceImpl{postRepo: repo}
 }
 
-func (p *postServiceImpl) GetPosts(ctx context.Context) ([]models.EntirePost, error) {
+func (p *postServiceImpl) GetPosts(ctx context.Context) ([]models.Posts, error) {
 
 	// database context should be shorter than formal response context.
 	// make new context
