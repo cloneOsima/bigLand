@@ -19,8 +19,8 @@ formatter: goimports
 include-auto-generated: false
 log-level: info
 structname: 'Mock{{.InterfaceName}}'
-recursive: true                   // 하위 디렉토리 인터페이스의 목 객체 생성
-exclude-subpkg-regex: ["handlers"]  // handler mock 객체 생성 제외
+recursive: true                      // 하위 디렉토리 인터페이스의 목 객체 생성
+exclude-subpkg-regex: ["handlers"]    // handler mock 객체 생성 제외
 require-template-schema-exists: true
 template: testify
 template-schema: '{{.Template}}.schema.json'
