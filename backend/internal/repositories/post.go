@@ -8,11 +8,14 @@ import (
 	"log"
 
 	"github.com/cloneOsima/bigLand/backend/internal/models"
+	"github.com/cloneOsima/bigLand/backend/internal/utils"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type PostRepository interface {
-	GetPosts(ctx context.Context) ([]models.Posts, error)
+	GetPosts(ctx context.Context) ([]*models.Posts, error)
+	GetPostInfo(dbCtx context.Context) (*models.Post, error)
 }
 
 type postRepoImpl struct {
@@ -25,7 +28,7 @@ func NewPostRepository(pool *pgxpool.Pool) PostRepository {
 	}
 }
 
-func (p *postRepoImpl) GetPosts(dbCtx context.Context) ([]models.Posts, error) {
+func (p *postRepoImpl) GetPosts(dbCtx context.Context) ([]*models.Posts, error) {
 	if p.dbPool == nil {
 		return nil, fmt.Errorf("connection pool is not initialized")
 	}
@@ -46,11 +49,11 @@ func (p *postRepoImpl) GetPosts(dbCtx context.Context) ([]models.Posts, error) {
 	}
 	defer rows.Close()
 
-	var result = make([]models.Posts, 0, 50)
-	var post models.Posts
+	var result = make([]*models.Posts, 0, 50)
 
 	// 결과 row 스캔 및 dataset에 매핑
 	for rows.Next() {
+		post := &models.Posts{}
 		err := rows.Scan(
 			&post.PostId,
 			&post.PostedDate,
@@ -74,6 +77,43 @@ func (p *postRepoImpl) GetPosts(dbCtx context.Context) ([]models.Posts, error) {
 	// test printing
 	for _, post := range result {
 		fmt.Printf("Fetched data: %+v\n", post)
+	}
+
+	return result, nil
+}
+
+func (p *postRepoImpl) GetPostInfo(dbCtx context.Context) (*models.Post, error) {
+	if p.dbPool == nil {
+		return nil, fmt.Errorf("connection pool is not initialized")
+	}
+	var postIdKey utils.CtxKey = "postId"
+	postId := dbCtx.Value(postIdKey)
+
+	query := `
+		SELECT post_id, content, incident_date, posted_date, address_text, latitude, longtitude, location
+		FROM posts
+		WHERE is_active = true
+		AND post_id = $1
+	`
+
+	row := p.dbPool.QueryRow(dbCtx, query, postId)
+	result := &models.Post{}
+
+	err := row.Scan(
+		&result.PostId,
+		&result.Content,
+		&result.IncidentDate,
+		&result.PostedDate,
+		&result.AddressText,
+		&result.Latitude,
+		&result.Longtitude,
+		&result.Location,
+	)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
 	}
 
 	return result, nil
