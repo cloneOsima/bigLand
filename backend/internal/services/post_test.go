@@ -9,6 +9,7 @@ import (
 	"github.com/cloneOsima/bigLand/backend/internal/mocks/repositories"
 	"github.com/cloneOsima/bigLand/backend/internal/models"
 	"github.com/cloneOsima/bigLand/backend/internal/services"
+	"github.com/cloneOsima/bigLand/backend/internal/utils"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -76,6 +77,8 @@ func TestGetPostInfo(t *testing.T) {
 	testUUID, _ := uuid.NewUUID()
 	testTime := time.Now()
 	testLocationText := "testlocation"
+	var testCtxKey utils.CtxKey = "postId"
+
 	tests := []struct {
 		name       string
 		mockReturn *models.Post
@@ -113,8 +116,11 @@ func TestGetPostInfo(t *testing.T) {
 			mockRepo := repositories.NewMockPostRepository(t)
 			mockRepo.On("GetPostInfo", mock.Anything).Return(tc.mockReturn, tc.mockError)
 
+			ctx := context.Background()
+			ctx = context.WithValue(ctx, testCtxKey, testUUID.String())
+
 			postService := services.NewPostService(mockRepo)
-			result, err := postService.GetPostInfo(context.Background())
+			result, err := postService.GetPostInfo(ctx)
 
 			if (err != nil && tc.expectErr == nil) || (err == nil && tc.expectErr != nil) || (err != nil && err.Error() != tc.expectErr.Error()) {
 				t.Errorf("예상 에러: '%v', 실제 에러: '%v'", tc.expectErr, err)
