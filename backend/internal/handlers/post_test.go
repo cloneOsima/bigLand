@@ -31,20 +31,20 @@ func TestGetPosts(t *testing.T) {
 
 	testCases := []struct {
 		name           string
-		svcReturn      []models.Posts
+		svcReturn      []*models.Posts
 		returnErr      error
 		expectedStatus int
-		expectedBody   []models.Posts
+		expectedBody   []*models.Posts
 	}{
 		{
 			name: "Success - Formal Response",
-			svcReturn: []models.Posts{
+			svcReturn: []*models.Posts{
 				{PostId: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: sampleText, Location: testLocationText},
 				{PostId: testUUID, PostedDate: testTime, Latitude: 0.02, Longtitude: 0.01, AddressText: sampleText, Location: testLocationText},
 			},
 			returnErr:      nil,
 			expectedStatus: http.StatusOK,
-			expectedBody: []models.Posts{
+			expectedBody: []*models.Posts{
 				{PostId: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: sampleText, Location: testLocationText},
 				{PostId: testUUID, PostedDate: testTime, Latitude: 0.02, Longtitude: 0.01, AddressText: sampleText, Location: testLocationText},
 			},
@@ -139,10 +139,10 @@ func TestGetPostInfo(t *testing.T) {
 		expectedBody   models.Post
 	}{
 		{
-			name: "Success - Formal Result(GetPostsInfo)",
+			name: "Success - Formal Result(GetPostInfo)",
 			svcReturn: &models.Post{
 				PostId:       testUUID,
-				Content:      "",
+				Content:      "test-content",
 				IncidentDate: testTime,
 				PostedDate:   testTime,
 				Latitude:     0.01,
@@ -155,7 +155,7 @@ func TestGetPostInfo(t *testing.T) {
 			expectedStatus: http.StatusOK,
 			expectedBody: models.Post{
 				PostId:       testUUID,
-				Content:      "",
+				Content:      "test-content",
 				IncidentDate: testTime,
 				PostedDate:   testTime,
 				Latitude:     0.01,
@@ -195,7 +195,7 @@ func TestGetPostInfo(t *testing.T) {
 			t.Parallel()
 
 			mockSvc := services.NewMockPostService(t)
-			mockSvc.On("GetPost", mock.Anything).Return(tc.svcReturn, tc.returnErr)
+			mockSvc.On("GetPostInfo", mock.Anything).Return(tc.svcReturn, tc.returnErr)
 			url := fmt.Sprintf("/post/%s", testUUID)
 
 			w := httptest.NewRecorder()
@@ -206,7 +206,7 @@ func TestGetPostInfo(t *testing.T) {
 			c.Request = req
 
 			handler := handlers.NewPostHandler(mockSvc)
-			handler.GetPosts(c)
+			handler.GetPostInfo(c)
 
 			if tc.name == "Success - Formal Result(GetPostsInfo)" {
 				var got models.Post

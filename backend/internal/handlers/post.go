@@ -15,7 +15,7 @@ import (
 
 type Handler interface {
 	GetPosts(c *gin.Context)
-	GetPost(c *gin.Context)
+	GetPostInfo(c *gin.Context)
 }
 
 type handlerImpl struct {
@@ -36,10 +36,10 @@ func PingHandler(c *gin.Context) {
 func (h *handlerImpl) GetPosts(c *gin.Context) {
 
 	reqId := reqIdChecker(c)
-
+	var requestIdKey utils.CtxKey = "reqId"
 	// use gin.Contexts -> can check user connection & middleware information
 	ctx, cancle := context.WithTimeout(c.Request.Context(), 10*time.Second)
-	ctx = context.WithValue(ctx, "requestId", reqId)
+	ctx = context.WithValue(ctx, requestIdKey, reqId)
 	defer cancle()
 
 	result, err := h.postSvc.GetPosts(ctx)
@@ -50,14 +50,18 @@ func (h *handlerImpl) GetPosts(c *gin.Context) {
 // 특정 GIS 데이터를 선택하거나, 최근 등록글을 선택하면 해당 투고에 대한 상세 정보를 제공해주는 함수
 func (h *handlerImpl) GetPostInfo(c *gin.Context) {
 	reqId := reqIdChecker(c)
+	postId := c.Param("id")
 
+	var requestIdKey utils.CtxKey = "reqId"
+	var postIdKey utils.CtxKey = "postId"
 	ctx, cancle := context.WithTimeout(c.Request.Context(), 10*time.Second)
-	ctx = context.WithValue(ctx, "requestId", reqId)
+	ctx = context.WithValue(ctx, requestIdKey, reqId)
+	ctx = context.WithValue(ctx, postIdKey, postId)
 	defer cancle()
 
 	result, err := h.postSvc.GetPostInfo(ctx)
 	commonErrorChecker(c, ctx, err, reqId)
-
+	fmt.Println("반환값: ", result)
 	c.JSON(http.StatusOK, result)
 }
 

@@ -13,6 +13,7 @@ func SetupRouter(h handlers.Handler) *gin.Engine {
 
 	r.GET("/ping", handlers.PingHandler)
 	r.GET("/posts", h.GetPosts)
+	r.GET("/post/:id", h.GetPostInfo)
 
 	return r
 }

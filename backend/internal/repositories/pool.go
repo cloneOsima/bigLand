@@ -15,7 +15,7 @@ var dbPool *pgxpool.Pool
 
 // 서버 셋업 시 tracnsaction pool 생성
 func InitPool() (*pgxpool.Pool, error) {
-	err := godotenv.Load("configs/postgresql.env")
+	err := godotenv.Load("internal/configs/postgresql.env")
 	if err != nil {
 		log.Fatalf("Errors: Failed to load postgresql.env file")
 		return nil, err
