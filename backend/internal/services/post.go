@@ -33,9 +33,23 @@ func (p *postServiceImpl) GetPosts(ctx context.Context) ([]*models.Posts, error)
 	dbCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	result, err := p.postRepo.GetPosts(dbCtx)
+	// get data by using sqlc struct
+	sqlcPosts, err := p.postRepo.GetPosts(dbCtx)
 	if err != nil {
 		return nil, err
+	}
+
+	// mapping sqlc struct <> models package
+	var result []*models.Posts
+	for _, sp := range sqlcPosts {
+		result = append(result, &models.Posts{
+			PostID:      sp.PostID,
+			PostedDate:  sp.PostedDate,
+			AddressText: sp.AddressText,
+			Latitude:    sp.Latitude,
+			Longtitude:  sp.Longtitude,
+			Location:    sp.Location,
+		})
 	}
 
 	return result, nil
@@ -45,6 +59,7 @@ func (p *postServiceImpl) GetPostInfo(ctx context.Context) (*models.Post, error)
 
 	var postIdKey utils.CtxKey = "postId"
 
+	// 전달 받은 UUID 값 valid test
 	originValue := ctx.Value(postIdKey)
 	strValue, ok := originValue.(string)
 	if !ok {
@@ -59,9 +74,21 @@ func (p *postServiceImpl) GetPostInfo(ctx context.Context) (*models.Post, error)
 	dbCtx = context.WithValue(dbCtx, postIdKey, ctxValue)
 	defer cancel()
 
-	result, err := p.postRepo.GetPostInfo(dbCtx)
+	sqlcPost, err := p.postRepo.GetPostInfo(dbCtx)
 	if err != nil {
 		return nil, err
+	}
+
+	var result = new(models.Post)
+	result = &models.Post{
+		PostID:       sqlcPost.PostID,
+		Content:      sqlcPost.Content,
+		IncidentDate: sqlcPost.IncidentDate.Time,
+		PostedDate:   sqlcPost.PostedDate,
+		Latitude:     sqlcPost.Latitude,
+		Longtitude:   sqlcPost.Longtitude,
+		AddressText:  sqlcPost.AddressText,
+		Location:     sqlcPost.Location,
 	}
 
 	return result, nil

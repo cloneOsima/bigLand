@@ -39,14 +39,14 @@ func TestGetPosts(t *testing.T) {
 		{
 			name: "Success - Formal Response",
 			svcReturn: []*models.Posts{
-				{PostId: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: sampleText, Location: testLocationText},
-				{PostId: testUUID, PostedDate: testTime, Latitude: 0.02, Longtitude: 0.01, AddressText: sampleText, Location: testLocationText},
+				{PostID: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: sampleText, Location: testLocationText},
+				{PostID: testUUID, PostedDate: testTime, Latitude: 0.02, Longtitude: 0.01, AddressText: sampleText, Location: testLocationText},
 			},
 			returnErr:      nil,
 			expectedStatus: http.StatusOK,
 			expectedBody: []*models.Posts{
-				{PostId: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: sampleText, Location: testLocationText},
-				{PostId: testUUID, PostedDate: testTime, Latitude: 0.02, Longtitude: 0.01, AddressText: sampleText, Location: testLocationText},
+				{PostID: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: sampleText, Location: testLocationText},
+				{PostID: testUUID, PostedDate: testTime, Latitude: 0.02, Longtitude: 0.01, AddressText: sampleText, Location: testLocationText},
 			},
 		},
 		{
@@ -103,8 +103,8 @@ func TestGetPosts(t *testing.T) {
 				}
 
 				for i := range got {
-					if got[i].PostId != tc.expectedBody[i].PostId {
-						t.Errorf("postId mismatch: expected %v, got %v", tc.expectedBody[i].PostId, got[i].PostId)
+					if got[i].PostID != tc.expectedBody[i].PostID {
+						t.Errorf("postId mismatch: expected %v, got %v", tc.expectedBody[i].PostID, got[i].PostID)
 					}
 					if !got[i].PostedDate.Equal(tc.expectedBody[i].PostedDate) {
 						t.Errorf("postedDate mismatch: expected %v, got %v", tc.expectedBody[i].PostedDate, got[i].PostedDate)
@@ -141,7 +141,7 @@ func TestGetPostInfo(t *testing.T) {
 		{
 			name: "Success - Formal Result(GetPostInfo)",
 			svcReturn: &models.Post{
-				PostId:       testUUID,
+				PostID:       testUUID,
 				Content:      "test-content",
 				IncidentDate: testTime,
 				PostedDate:   testTime,
@@ -154,7 +154,7 @@ func TestGetPostInfo(t *testing.T) {
 			returnErr:      nil,
 			expectedStatus: http.StatusOK,
 			expectedBody: models.Post{
-				PostId:       testUUID,
+				PostID:       testUUID,
 				Content:      "test-content",
 				IncidentDate: testTime,
 				PostedDate:   testTime,
@@ -214,8 +214,8 @@ func TestGetPostInfo(t *testing.T) {
 				if err := json.Unmarshal(w.Body.Bytes(), &got); err != nil {
 					t.Fatalf("failed to unmarshal response body: %v", err)
 				}
-				if got.PostId != tc.expectedBody.PostId {
-					t.Errorf("postId mismatch: expected %v, got %v", tc.expectedBody.PostId, got.PostId)
+				if got.PostID != tc.expectedBody.PostID {
+					t.Errorf("postId mismatch: expected %v, got %v", tc.expectedBody.PostID, got.PostID)
 				}
 				if !got.PostedDate.Equal(tc.expectedBody.PostedDate) {
 					t.Errorf("postedDate mismatch: expected %v, got %v", tc.expectedBody.PostedDate, got.PostedDate)

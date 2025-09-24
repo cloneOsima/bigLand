@@ -9,8 +9,10 @@ import (
 	"github.com/cloneOsima/bigLand/backend/internal/mocks/repositories"
 	"github.com/cloneOsima/bigLand/backend/internal/models"
 	"github.com/cloneOsima/bigLand/backend/internal/services"
+	"github.com/cloneOsima/bigLand/backend/internal/sqlc"
 	"github.com/cloneOsima/bigLand/backend/internal/utils"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -21,20 +23,20 @@ func TestGetPosts(t *testing.T) {
 	testLocationText := "testlocation"
 	tests := []struct {
 		name        string
-		mockReturn  []*models.Posts
+		mockReturn  []sqlc.GetPostsRow
 		mockError   error
 		expectPosts []*models.Posts
 		expectErr   error
 	}{
 		{
 			name: "Success - Returns posts",
-			mockReturn: []*models.Posts{
-				{PostId: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: "test", Location: []byte(testLocationText)},
-				{PostId: testUUID, PostedDate: testTime.Add(10 * time.Minute), Latitude: 0.02, Longtitude: 0.01, AddressText: "test2", Location: []byte(testLocationText)}},
+			mockReturn: []sqlc.GetPostsRow{
+				{PostID: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: "test", Location: []byte(testLocationText)},
+				{PostID: testUUID, PostedDate: testTime.Add(10 * time.Minute), Latitude: 0.02, Longtitude: 0.01, AddressText: "test2", Location: []byte(testLocationText)}},
 			mockError: nil,
 			expectPosts: []*models.Posts{
-				{PostId: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: "test", Location: []byte(testLocationText)},
-				{PostId: testUUID, PostedDate: testTime.Add(10 * time.Minute), Latitude: 0.02, Longtitude: 0.01, AddressText: "test2", Location: []byte(testLocationText)}},
+				{PostID: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: "test", Location: []byte(testLocationText)},
+				{PostID: testUUID, PostedDate: testTime.Add(10 * time.Minute), Latitude: 0.02, Longtitude: 0.01, AddressText: "test2", Location: []byte(testLocationText)}},
 			expectErr: nil,
 		},
 		{
@@ -46,7 +48,7 @@ func TestGetPosts(t *testing.T) {
 		},
 		{
 			name:        "Success - No posts found (empty slice)",
-			mockReturn:  []*models.Posts{},
+			mockReturn:  []sqlc.GetPostsRow{},
 			mockError:   nil,
 			expectPosts: nil,
 			expectErr:   nil,
@@ -76,33 +78,38 @@ func TestGetPosts(t *testing.T) {
 func TestGetPostInfo(t *testing.T) {
 	testUUID, _ := uuid.NewUUID()
 	testTime := time.Now()
+	testDate := time.Date(2025, 9, 24, 0, 0, 0, 0, time.UTC)
+	pgDate := pgtype.Date{
+		Time:  testDate,
+		Valid: true,
+	}
 	testLocationText := "testlocation"
 	var testCtxKey utils.CtxKey = "postId"
 
 	tests := []struct {
 		name       string
-		mockReturn *models.Post
+		mockReturn sqlc.GetPostInfoRow
 		mockError  error
 		expectPost *models.Post
 		expectErr  error
 	}{
 		{
 			name:       "Success - Return post info",
-			mockReturn: &models.Post{PostId: testUUID, Content: "test-content", IncidentDate: testTime, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: "test", Location: []byte(testLocationText)},
+			mockReturn: sqlc.GetPostInfoRow{PostID: testUUID, Content: "test-content", IncidentDate: pgDate, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: "test", Location: []byte(testLocationText)},
 			mockError:  nil,
-			expectPost: &models.Post{PostId: testUUID, Content: "test-content", IncidentDate: testTime, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: "test", Location: []byte(testLocationText)},
+			expectPost: &models.Post{PostID: testUUID, Content: "test-content", IncidentDate: testDate, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: "test", Location: []byte(testLocationText)},
 			expectErr:  nil,
 		},
 		{
 			name:       "Error - failed to query",
-			mockReturn: nil,
+			mockReturn: sqlc.GetPostInfoRow{},
 			mockError:  assert.AnError,
 			expectPost: &models.Post{},
 			expectErr:  assert.AnError,
 		},
 		{
 			name:       "Success - No post found (empty row)",
-			mockReturn: nil,
+			mockReturn: sqlc.GetPostInfoRow{},
 			mockError:  nil,
 			expectPost: &models.Post{},
 			expectErr:  nil,

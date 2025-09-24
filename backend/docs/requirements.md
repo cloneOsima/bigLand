@@ -1,7 +1,7 @@
 # Required functions
 - get post list (50 limit)  : fin
-- get post info             : in progress 
-- create a new post
+- get post info             : fin
+- create a new post         : in progress
 - comment
 - delete post (admin)
 - delete comment (admin)
