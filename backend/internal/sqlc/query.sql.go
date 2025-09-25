@@ -13,6 +13,43 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const createPost = `-- name: CreatePost :exec
+INSERT INTO posts (
+    content,
+    incident_date,
+    latitude,
+    longtitude,
+    address_text,
+    location
+) VALUES (
+    $1,
+    $2,
+    $3,
+    $4,
+    $5,
+    ST_SetSRID(ST_MakePoint($4, $3), 4326)
+)
+`
+
+type CreatePostParams struct {
+	Content      string
+	IncidentDate pgtype.Date
+	Latitude     *float64
+	Longtitude   *float64
+	AddressText  string
+}
+
+func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) error {
+	_, err := q.db.Exec(ctx, createPost,
+		arg.Content,
+		arg.IncidentDate,
+		arg.Latitude,
+		arg.Longtitude,
+		arg.AddressText,
+	)
+	return err
+}
+
 const getPostInfo = `-- name: GetPostInfo :one
 SELECT post_id, content, incident_date, posted_date, address_text, latitude, longtitude, location
 FROM posts
@@ -26,8 +63,8 @@ type GetPostInfoRow struct {
 	IncidentDate pgtype.Date
 	PostedDate   time.Time
 	AddressText  string
-	Latitude     float64
-	Longtitude   float64
+	Latitude     *float64
+	Longtitude   *float64
 	Location     []byte
 }
 
@@ -59,8 +96,8 @@ type GetPostsRow struct {
 	PostID      uuid.UUID
 	PostedDate  time.Time
 	AddressText string
-	Latitude    float64
-	Longtitude  float64
+	Latitude    *float64
+	Longtitude  *float64
 	Location    []byte
 }
 

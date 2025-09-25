@@ -12,8 +12,8 @@ type Post struct {
 	Content      string    `db:"content" json:"content"`
 	IncidentDate time.Time `db:"incident_date" json:"incident_date"`
 	PostedDate   time.Time `db:"posted_date" json:"posted_date"`
-	Latitude     float64   `db:"latitude" json:"latitude"`
-	Longtitude   float64   `db:"longitude" json:"longitude"`
+	Latitude     *float64  `db:"latitude" json:"latitude"`
+	Longtitude   *float64  `db:"longitude" json:"longitude"`
 	AddressText  string    `db:"address_text" json:"address_text"`
 	Location     []byte    `db:"location" json:"location"`
 	IsActive     bool      `db:"is_active" json:"is_active"`
@@ -22,8 +22,8 @@ type Post struct {
 type Posts struct {
 	PostID      uuid.UUID `db:"post_id" json:"post_id"`
 	PostedDate  time.Time `db:"posted_date" json:"posted_date"`
-	Latitude    float64   `db:"latitude" json:"latitude"`
-	Longtitude  float64   `db:"longtitude" json:"longtitude"`
+	Latitude    *float64  `db:"latitude" json:"latitude"`
+	Longtitude  *float64  `db:"longtitude" json:"longtitude"`
 	AddressText string    `db:"address_text" json:"address_text"`
 	Location    []byte    `db:"location" json:"location"`
 }

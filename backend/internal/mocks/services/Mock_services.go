@@ -38,9 +38,66 @@ func (_m *MockPostService) EXPECT() *MockPostService_Expecter {
 	return &MockPostService_Expecter{mock: &_m.Mock}
 }
 
+// CreatePost provides a mock function for the type MockPostService
+func (_mock *MockPostService) CreatePost(ctx context.Context, inputValue *models.Post) error {
+	ret := _mock.Called(ctx, inputValue)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreatePost")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Post) error); ok {
+		r0 = returnFunc(ctx, inputValue)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockPostService_CreatePost_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreatePost'
+type MockPostService_CreatePost_Call struct {
+	*mock.Call
+}
+
+// CreatePost is a helper method to define mock.On call
+//   - ctx context.Context
+//   - inputValue *models.Post
+func (_e *MockPostService_Expecter) CreatePost(ctx interface{}, inputValue interface{}) *MockPostService_CreatePost_Call {
+	return &MockPostService_CreatePost_Call{Call: _e.mock.On("CreatePost", ctx, inputValue)}
+}
+
+func (_c *MockPostService_CreatePost_Call) Run(run func(ctx context.Context, inputValue *models.Post)) *MockPostService_CreatePost_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *models.Post
+		if args[1] != nil {
+			arg1 = args[1].(*models.Post)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockPostService_CreatePost_Call) Return(err error) *MockPostService_CreatePost_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockPostService_CreatePost_Call) RunAndReturn(run func(ctx context.Context, inputValue *models.Post) error) *MockPostService_CreatePost_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetPostInfo provides a mock function for the type MockPostService
-func (_mock *MockPostService) GetPostInfo(ctx context.Context) (*models.Post, error) {
-	ret := _mock.Called(ctx)
+func (_mock *MockPostService) GetPostInfo(ctx context.Context, postID string) (*models.Post, error) {
+	ret := _mock.Called(ctx, postID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetPostInfo")
@@ -48,18 +105,18 @@ func (_mock *MockPostService) GetPostInfo(ctx context.Context) (*models.Post, er
 
 	var r0 *models.Post
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context) (*models.Post, error)); ok {
-		return returnFunc(ctx)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string) (*models.Post, error)); ok {
+		return returnFunc(ctx, postID)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context) *models.Post); ok {
-		r0 = returnFunc(ctx)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string) *models.Post); ok {
+		r0 = returnFunc(ctx, postID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*models.Post)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = returnFunc(ctx)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = returnFunc(ctx, postID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -73,18 +130,24 @@ type MockPostService_GetPostInfo_Call struct {
 
 // GetPostInfo is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *MockPostService_Expecter) GetPostInfo(ctx interface{}) *MockPostService_GetPostInfo_Call {
-	return &MockPostService_GetPostInfo_Call{Call: _e.mock.On("GetPostInfo", ctx)}
+//   - postID string
+func (_e *MockPostService_Expecter) GetPostInfo(ctx interface{}, postID interface{}) *MockPostService_GetPostInfo_Call {
+	return &MockPostService_GetPostInfo_Call{Call: _e.mock.On("GetPostInfo", ctx, postID)}
 }
 
-func (_c *MockPostService_GetPostInfo_Call) Run(run func(ctx context.Context)) *MockPostService_GetPostInfo_Call {
+func (_c *MockPostService_GetPostInfo_Call) Run(run func(ctx context.Context, postID string)) *MockPostService_GetPostInfo_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
 		run(
 			arg0,
+			arg1,
 		)
 	})
 	return _c
@@ -95,7 +158,7 @@ func (_c *MockPostService_GetPostInfo_Call) Return(post *models.Post, err error)
 	return _c
 }
 
-func (_c *MockPostService_GetPostInfo_Call) RunAndReturn(run func(ctx context.Context) (*models.Post, error)) *MockPostService_GetPostInfo_Call {
+func (_c *MockPostService_GetPostInfo_Call) RunAndReturn(run func(ctx context.Context, postID string) (*models.Post, error)) *MockPostService_GetPostInfo_Call {
 	_c.Call.Return(run)
 	return _c
 }

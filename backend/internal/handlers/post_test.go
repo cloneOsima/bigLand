@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -18,17 +19,17 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-var testUUID uuid.UUID
-var testTime time.Time = time.Now()
-var testLocationText []byte = []byte("testlocation")
-var otherErrors error = fmt.Errorf("Someting goes wrong except ctx.Deadline and ctx.Canceled.")
-var sampleText string = "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
+var (
+	lat              = 0.1
+	lng              = 0.2
+	testUUID, _      = uuid.NewUUID()
+	testTime         = time.Now()
+	testLocationText = "testlocation"
+	sampleText       = "sample text for testing"
+)
 
 func TestGetPosts(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-
-	testUUID, _ := uuid.NewUUID()
-
 	testCases := []struct {
 		name           string
 		svcReturn      []*models.Posts
@@ -39,14 +40,14 @@ func TestGetPosts(t *testing.T) {
 		{
 			name: "Success - Formal Response",
 			svcReturn: []*models.Posts{
-				{PostID: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: sampleText, Location: testLocationText},
-				{PostID: testUUID, PostedDate: testTime, Latitude: 0.02, Longtitude: 0.01, AddressText: sampleText, Location: testLocationText},
+				{PostID: testUUID, PostedDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: sampleText, Location: []byte(testLocationText)},
+				{PostID: testUUID, PostedDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: sampleText, Location: []byte(testLocationText)},
 			},
 			returnErr:      nil,
 			expectedStatus: http.StatusOK,
 			expectedBody: []*models.Posts{
-				{PostID: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: sampleText, Location: testLocationText},
-				{PostID: testUUID, PostedDate: testTime, Latitude: 0.02, Longtitude: 0.01, AddressText: sampleText, Location: testLocationText},
+				{PostID: testUUID, PostedDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: sampleText, Location: []byte(testLocationText)},
+				{PostID: testUUID, PostedDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: sampleText, Location: []byte(testLocationText)},
 			},
 		},
 		{
@@ -66,7 +67,7 @@ func TestGetPosts(t *testing.T) {
 		{
 			name:           "Error - InternalServerError",
 			svcReturn:      nil,
-			returnErr:      otherErrors,
+			returnErr:      errors.New("otherErrors"),
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   nil,
 		},
@@ -103,17 +104,22 @@ func TestGetPosts(t *testing.T) {
 				}
 
 				for i := range got {
+					expectedLat := *tc.expectedBody[i].Latitude
+					expectedLng := *tc.expectedBody[i].Longtitude
+					gotLat := *got[i].Latitude
+					gotLng := *got[i].Longtitude
+
 					if got[i].PostID != tc.expectedBody[i].PostID {
 						t.Errorf("postId mismatch: expected %v, got %v", tc.expectedBody[i].PostID, got[i].PostID)
 					}
 					if !got[i].PostedDate.Equal(tc.expectedBody[i].PostedDate) {
 						t.Errorf("postedDate mismatch: expected %v, got %v", tc.expectedBody[i].PostedDate, got[i].PostedDate)
 					}
-					if got[i].Latitude != tc.expectedBody[i].Latitude {
-						t.Errorf("latitude mismatch: expected %v, got %v", tc.expectedBody[i].Latitude, got[i].Latitude)
+					if expectedLat != gotLat {
+						t.Errorf("latitude mismatch: expected %v, got %v", expectedLat, gotLat)
 					}
-					if got[i].Longtitude != tc.expectedBody[i].Longtitude {
-						t.Errorf("longtitude mismatch: expected %v, got %v", tc.expectedBody[i].Longtitude, got[i].Longtitude)
+					if expectedLng != gotLng {
+						t.Errorf("longtitude mismatch: expected %v, got %v", expectedLat, gotLat)
 					}
 					if got[i].AddressText != tc.expectedBody[i].AddressText {
 						t.Errorf("addressText mismatch: expected %v, got %v", tc.expectedBody[i].AddressText, got[i].AddressText)
@@ -130,7 +136,6 @@ func TestGetPosts(t *testing.T) {
 func TestGetPostInfo(t *testing.T) {
 
 	testUUID, _ := uuid.NewUUID()
-
 	testCases := []struct {
 		name           string
 		svcReturn      *models.Post
@@ -145,10 +150,10 @@ func TestGetPostInfo(t *testing.T) {
 				Content:      "test-content",
 				IncidentDate: testTime,
 				PostedDate:   testTime,
-				Latitude:     0.01,
-				Longtitude:   0.02,
+				Latitude:     &lat,
+				Longtitude:   &lng,
 				AddressText:  sampleText,
-				Location:     testLocationText,
+				Location:     []byte(testLocationText),
 				IsActive:     true,
 			},
 			returnErr:      nil,
@@ -158,10 +163,10 @@ func TestGetPostInfo(t *testing.T) {
 				Content:      "test-content",
 				IncidentDate: testTime,
 				PostedDate:   testTime,
-				Latitude:     0.01,
-				Longtitude:   0.02,
+				Latitude:     &lat,
+				Longtitude:   &lng,
 				AddressText:  sampleText,
-				Location:     testLocationText,
+				Location:     []byte(testLocationText),
 				IsActive:     true,
 			},
 		},
@@ -183,7 +188,7 @@ func TestGetPostInfo(t *testing.T) {
 		{
 			name:           "Error - InternalServerError(GetPostInfo)",
 			svcReturn:      nil,
-			returnErr:      otherErrors,
+			returnErr:      errors.New("otherErrors"),
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   models.Post{},
 		},
@@ -195,7 +200,7 @@ func TestGetPostInfo(t *testing.T) {
 			t.Parallel()
 
 			mockSvc := services.NewMockPostService(t)
-			mockSvc.On("GetPostInfo", mock.Anything).Return(tc.svcReturn, tc.returnErr)
+			mockSvc.On("GetPostInfo", mock.Anything, testUUID.String()).Return(tc.svcReturn, tc.returnErr)
 			url := fmt.Sprintf("/post/%s", testUUID)
 
 			w := httptest.NewRecorder()
@@ -204,6 +209,9 @@ func TestGetPostInfo(t *testing.T) {
 			req.Header.Set("X-Request-ID", "test-request-id")
 
 			c.Request = req
+			c.Params = gin.Params{
+				{Key: "id", Value: testUUID.String()},
+			}
 
 			handler := handlers.NewPostHandler(mockSvc)
 			handler.GetPostInfo(c)

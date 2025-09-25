@@ -4,13 +4,39 @@ package repositories
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cloneOsima/bigLand/backend/internal/sqlc"
-	"github.com/cloneOsima/bigLand/backend/internal/utils"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+type PostRepository interface {
+	GetPosts(ctx context.Context) ([]sqlc.GetPostsRow, error)
+	GetPostInfo(ctx context.Context, postID uuid.UUID) (sqlc.GetPostInfoRow, error)
+	CreatePost(dbCtx context.Context, info sqlc.CreatePostParams) error
+}
+
+type postRepoImpl struct {
+	q *sqlc.Queries
+}
+
+func NewPostRepository(pool *pgxpool.Pool) PostRepository {
+	return &postRepoImpl{
+		q: sqlc.New(pool),
+	}
+}
+
+func (p *postRepoImpl) GetPosts(dbCtx context.Context) ([]sqlc.GetPostsRow, error) {
+	return p.q.GetPosts(dbCtx)
+}
+
+func (p *postRepoImpl) GetPostInfo(dbCtx context.Context, postID uuid.UUID) (sqlc.GetPostInfoRow, error) {
+	return p.q.GetPostInfo(dbCtx, postID)
+}
+
+func (p *postRepoImpl) CreatePost(dbCtx context.Context, info sqlc.CreatePostParams) error {
+	return p.q.CreatePost(dbCtx, info)
+}
 
 // type PostRepository interface {
 // 	GetPosts(ctx context.Context) ([]*models.Posts, error)
@@ -26,21 +52,6 @@ import (
 // 		dbPool: pool,
 // 	}
 // }
-
-type PostRepository interface {
-	GetPosts(ctx context.Context) ([]sqlc.GetPostsRow, error)
-	GetPostInfo(ctx context.Context) (sqlc.GetPostInfoRow, error)
-}
-
-type postRepoImpl struct {
-	q *sqlc.Queries
-}
-
-func NewPostRepository(pool *pgxpool.Pool) PostRepository {
-	return &postRepoImpl{
-		q: sqlc.New(pool),
-	}
-}
 
 // func (p *postRepoImpl) GetPosts(dbCtx context.Context) ([]*models.Posts, error) {
 // 	if p.dbPool == nil {
@@ -132,18 +143,3 @@ func NewPostRepository(pool *pgxpool.Pool) PostRepository {
 
 // 	return result, nil
 // }
-
-func (p *postRepoImpl) GetPosts(dbCtx context.Context) ([]sqlc.GetPostsRow, error) {
-	return p.q.GetPosts(dbCtx)
-}
-
-func (p *postRepoImpl) GetPostInfo(dbCtx context.Context) (sqlc.GetPostInfoRow, error) {
-	var postIdKey utils.CtxKey = "postId"
-	anyId := dbCtx.Value(postIdKey)
-	postId, ok := anyId.(uuid.UUID)
-	if !ok {
-		return sqlc.GetPostInfoRow{}, fmt.Errorf("invalid postId type in context")
-	}
-
-	return p.q.GetPostInfo(dbCtx, postId)
-}

@@ -13,8 +13,8 @@ import (
 
 type Comment struct {
 	CommentID  uuid.UUID
-	PostID     pgtype.UUID
-	AuthorID   pgtype.UUID
+	PostID     uuid.UUID
+	AuthorID   uuid.UUID
 	Content    string
 	PostedDate time.Time
 	IsActive   pgtype.Bool
@@ -25,8 +25,8 @@ type Post struct {
 	Content      string
 	IncidentDate pgtype.Date
 	PostedDate   time.Time
-	Latitude     float64
-	Longtitude   float64
+	Latitude     *float64
+	Longtitude   *float64
 	AddressText  string
 	Location     []byte
 	IsActive     pgtype.Bool

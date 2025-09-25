@@ -37,6 +37,20 @@ sql:
         - column: "posts.location"
           go_type: 
             type: "[]byte"
+        - column: "comments.post_id"
+          go_type:
+            import: "github.com/google/uuid"
+            type: "UUID"
+        - column: "comments.author_id"
+          go_type:
+            import: "github.com/google/uuid"
+            type: "UUID"
+        - column: "*.latitude"
+          go_type:
+            type: "*float64"
+        - column: "*.longtitude"
+          go_type:
+            type: "*float64"
 overrides:
     go: null
 plugins: []

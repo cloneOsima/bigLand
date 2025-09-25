@@ -1,5 +1,8 @@
 [sqlc site](https://docs.sqlc.dev/en/latest/index.html)
 
+- repository layer 에서 query를 직접 사용하다보니 함수가 너무 길어지고 읽기가 힘들어지는 문제가 생김 
+- query 를 별도의 sql 파일로 저장하고 sqlc 를 사용하여 해당 쿼리와 db 스키마를 활용한 구조체/함수를 생성
+
 ## Install & Use
 ```
 $> go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
@@ -16,19 +19,52 @@ cloud:
     hostname: ""
 servers: []
 sql:                
-  - engine: "postgresql"        // slqc 관련 쿼리/스키마 파일 위치 지정 
+  - engine: "postgresql"        
     queries: "./internal/repositories/query.sql"
     schema: "./internal/repositories/schema.sql"
     gen:
-      go:                       // sqlc 사용할 언어 및 산출물 저장 위치 지정
-        package: "sqlc"             
-        out: "./internal/sqlc"
-        sql_package: "pgx/v5"
+      go:                       
+        package: "sqlc"                                 // 생성된 sqlc 파일이 사용할 패키지명 제시
+        out: "./internal/sqlc"                          // sqlc 파일 생성 위치 
+        sql_package: "pgx/v5"                           
+        overrides:                                      // sqlc 에서 pgtype으로 만드는 값들을 go 타입으로 override
+        - db_type: "uuid"
+          nullable: false
+          go_type:
+            import: "github.com/google/uuid"
+            type: "UUID"
+        - db_type: "pg_catalog.text"
+          go_type:
+            type: "string"
+          nullable: true
+        - db_type: "text"
+          go_type:
+            type: "string"
+          nullable: true
+        - db_type: "pg_catalog.timestamptz"
+          go_type:
+            type: "time.Time"
+          nullable: true
+        - db_type: "pg_catalog.timestamptz"
+          go_type:
+            type: "time.Time"
+        - column: "posts.location"
+          go_type: 
+            type: "[]byte"
+        - column: "comments.post_id"
+          go_type:
+            import: "github.com/google/uuid"
+            type: "UUID"
+        - column: "comments.author_id"
+          go_type:
+            import: "github.com/google/uuid"
+            type: "UUID"
 overrides:
     go: null
 plugins: []
 rules: []
 options: {}
+
 ```
 이외는 초기값에 수정안함
 
