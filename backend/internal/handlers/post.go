@@ -3,6 +3,7 @@ package handlers
 // Handlers package for processing Http request.
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -103,9 +104,10 @@ func reqIdChecker(c *gin.Context) string {
 func commonErrorChecker(c *gin.Context, ctx context.Context, err error, reqId string) {
 	if err != nil {
 
-		if apperr, ok := err.(*errdefs.AppError); ok {
+		// 에러가 잘못된 값으로 발생한 에러일 경우 400과 함께 내용 반환
+		if apperr, ok := err.(*errdefs.ValueErr); ok {
 			log.Printf("[Request failed] Request Id: %s, Error: %v, ErrorInfo: %v", reqId, err, apperr.ErrorInfo)
-			c.JSON(http.StatusInternalServerError, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"error":     "Request timeout",
 				"requestID": reqId,
 			})
@@ -113,28 +115,24 @@ func commonErrorChecker(c *gin.Context, ctx context.Context, err error, reqId st
 		}
 
 		log.Printf("[Request failed] Request Id: %s, Error: %v", reqId, err)
-
-		if ctx.Err() == context.DeadlineExceeded {
+		if errors.Is(err, context.DeadlineExceeded) || ctx.Err() == context.DeadlineExceeded {
 			c.JSON(http.StatusRequestTimeout, gin.H{
 				"error":     "Request timeout",
 				"requestID": reqId,
 			})
 			return
 		}
-
-		if ctx.Err() == context.Canceled {
+		if errors.Is(err, context.Canceled) || ctx.Err() == context.Canceled {
 			c.JSON(http.StatusRequestTimeout, gin.H{
 				"error":     "Request cancelled",
 				"requestID": reqId,
 			})
 			return
 		}
-
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":     err.Error(),
 			"requestID": reqId,
 		})
 		return
 	}
-
 }

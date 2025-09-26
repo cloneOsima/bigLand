@@ -123,7 +123,7 @@ func (p *postServiceImpl) CreatePost(ctx context.Context, info *models.Post) err
 }
 
 // CreatePost function validation check 가 너무 길어저셔 뺴놓은 함수
-func createValueCheck(info *models.Post) *errdefs.AppError {
+func createValueCheck(info *models.Post) *errdefs.ValueErr {
 	var nTime time.Time
 	switch {
 	case info.Content == "":
@@ -141,6 +141,14 @@ func createValueCheck(info *models.Post) *errdefs.AppError {
 	case info.Longtitude == nil:
 		e := *errdefs.ErrEmptySpace
 		e.ErrorInfo = []string{"Longtitude"}
+		return &e
+	case *info.Latitude < -90 || *info.Latitude > 90:
+		e := *errdefs.ErrInvalidValue
+		e.ErrorInfo = []string{"Latitude", "lat should be in -90 ~ 90"}
+		return &e
+	case *info.Longtitude < -180 || *info.Longtitude > 180:
+		e := *errdefs.ErrInvalidValue
+		e.ErrorInfo = []string{"Longtitude", "lng should be in -180 ~ 180"}
 		return &e
 	case info.IncidentDate.After(time.Now()):
 		e := *errdefs.ErrInvalidValue

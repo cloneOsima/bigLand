@@ -143,6 +143,8 @@ func TestGetPostInfo(t *testing.T) {
 }
 
 func TestCreatePost(t *testing.T) {
+	invalidLat := -99.00
+	invalidLng := 399.00
 	var invalidTime time.Time
 	tests := []struct {
 		name        string
@@ -183,6 +185,20 @@ func TestCreatePost(t *testing.T) {
 			name:        "Error - Failed to create a new post(Validation Check - empty space(longtitude))",
 			inputValue:  &models.Post{Content: "create post test", IncidentDate: testTime, Latitude: &lat, Longtitude: nil, AddressText: "test address"},
 			expectedErr: errdefs.NewAppError(400, "input cannot be empty.", "Longtitude"),
+			mockErr:     nil,
+			flag:        false,
+		},
+		{
+			name:        "Error - Failed to create a new post(Validation Check - invalid value(latitude))",
+			inputValue:  &models.Post{Content: "create post test", IncidentDate: testTime, Latitude: &invalidLat, Longtitude: &lng, AddressText: "test address"},
+			expectedErr: errdefs.NewAppError(400, "an invalid input value", []string{"Latitude", "lat should be in -90 ~ 90"}),
+			mockErr:     nil,
+			flag:        false,
+		},
+		{
+			name:        "Error - Failed to create a new post(Validation Check - invalid value(longtitude))",
+			inputValue:  &models.Post{Content: "create post test", IncidentDate: testTime, Latitude: &lat, Longtitude: &invalidLng, AddressText: "test address"},
+			expectedErr: errdefs.NewAppError(400, "an invalid input value", []string{"Longtitude", "lng should be in -180 ~ 180"}),
 			mockErr:     nil,
 			flag:        false,
 		},

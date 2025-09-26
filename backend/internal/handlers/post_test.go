@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	errdefs "github.com/cloneOsima/bigLand/backend/internal/errors"
 	"github.com/cloneOsima/bigLand/backend/internal/handlers"
 	"github.com/cloneOsima/bigLand/backend/internal/mocks/services"
 	"github.com/cloneOsima/bigLand/backend/internal/models"
@@ -170,7 +171,6 @@ func TestGetPostInfo(t *testing.T) {
 				IsActive:     true,
 			},
 		},
-
 		{
 			name:           "Error - Context RequestTimeout(GetPostInfo)",
 			svcReturn:      nil,
@@ -254,9 +254,91 @@ func TestGetPostInfo(t *testing.T) {
 	}
 }
 
+// CreatePostHandler test
+// test cases
+// 1. success
+// 2. fail - context timeout, context cancel, internal server error
 func TestCreatePost(t *testing.T) {
-	// testcase
-	// 1. success
-	// 2. invalid value - error handling
+	jsonValue := `{
+				"content": "create post test content",
+				"incident_date": "2025-09-26T03:55:44.564Z",
+				"latitude": 0.0,
+				"longtitude": 0.1,
+				"address_text": "create post test address"
+			}`
+	testCases := []struct {
+		name           string
+		jsonBody       string
+		returnErr      error
+		expectedStatus int
+	}{
+		{
+			name:           "Success - create new post",
+			jsonBody:       jsonValue,
+			returnErr:      nil,
+			expectedStatus: http.StatusOK,
+		}, {
+			name:           "Error - Context RequestTimeout(CreatePost)",
+			jsonBody:       jsonValue,
+			returnErr:      context.DeadlineExceeded,
+			expectedStatus: http.StatusRequestTimeout,
+		}, {
+			name:           "Error - Context Canceled(CreatePost)",
+			jsonBody:       jsonValue,
+			returnErr:      context.Canceled,
+			expectedStatus: http.StatusRequestTimeout,
+		}, {
+			name:           "Error - InternalServerError(CreatePost)",
+			jsonBody:       jsonValue,
+			returnErr:      errors.New("internal error is occurred"),
+			expectedStatus: http.StatusInternalServerError,
+		}, {
+			name: "Error - Invalid value(Empty Space - CreatePost)",
+			jsonBody: `{
+				"content": "",
+				"incident_date": "2025-09-26T03:55:44.564Z",
+				"latitude": 0.0,
+				"longtitude": 0.1,
+				"address_text": "create post test address"
+			}`,
+			returnErr:      errdefs.ErrEmptySpace,
+			expectedStatus: http.StatusBadRequest,
+		}, {
+			name: "Error - Invalid value(wrong date - CreatePost)",
+			jsonBody: `{
+				"content": "create post test content",
+				"incident_date": "2025-09-28T03:55:44.564Z",
+				"latitude": 0.0,
+				"longtitude": 0.1,
+				"address_text": "create post test address"
+			}`,
+			returnErr:      errdefs.ErrInvalidValue,
+			expectedStatus: http.StatusBadRequest,
+		},
+	}
 
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockSvc := services.NewMockPostService(t)
+			mockSvc.On("CreatePost", mock.Anything, mock.AnythingOfType("*models.Post")).Return(tc.returnErr)
+
+			w := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(w)
+
+			req, _ := http.NewRequest(http.MethodPost, "/post", bytes.NewBuffer([]byte(tc.jsonBody)))
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("X-Request-ID", "test-request-id")
+			c.Request = req
+
+			handler := handlers.NewPostHandler(mockSvc)
+			handler.CreatePost(c)
+
+			if w.Code != tc.expectedStatus {
+				t.Errorf("expected status %d, got %d", tc.expectedStatus, w.Code)
+			}
+		})
+	}
 }

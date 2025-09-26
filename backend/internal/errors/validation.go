@@ -2,13 +2,13 @@ package errdefs
 
 import "fmt"
 
-type AppError struct {
+type ValueErr struct {
 	StatusCode int
 	Message    string
 	ErrorInfo  []string
 }
 
-func NewAppError(code int, msg string, args ...any) *AppError {
+func NewAppError(code int, msg string, args ...any) *ValueErr {
 	var m []string
 	for _, a := range args {
 		switch v := a.(type) {
@@ -20,18 +20,18 @@ func NewAppError(code int, msg string, args ...any) *AppError {
 			m = append(m, fmt.Sprint(v))
 		}
 	}
-	return &AppError{
+	return &ValueErr{
 		StatusCode: code,
 		Message:    msg,
 		ErrorInfo:  m,
 	}
 }
 
-func (e *AppError) Error() string {
+func (e *ValueErr) Error() string {
 	return fmt.Sprintf("%d: %s", e.StatusCode, e.Message)
 }
 
 var (
-	ErrEmptySpace   = &AppError{StatusCode: 400, Message: "input cannot be empty."}
-	ErrInvalidValue = &AppError{StatusCode: 400, Message: "an invalid input value"}
+	ErrEmptySpace   = &ValueErr{StatusCode: 400, Message: "input cannot be empty."}
+	ErrInvalidValue = &ValueErr{StatusCode: 400, Message: "an invalid input value"}
 )
