@@ -2,7 +2,6 @@ package services_test
 
 import (
 	"context"
-	"errors"
 	"reflect"
 	"testing"
 	"time"
@@ -150,48 +149,56 @@ func TestCreatePost(t *testing.T) {
 		inputValue  *models.Post
 		expectedErr error
 		mockErr     error
+		flag        bool
 	}{
 		{
 			name:        "Success - Create a new post",
 			inputValue:  &models.Post{Content: "create post test", IncidentDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: "test address"},
 			expectedErr: nil,
 			mockErr:     nil,
+			flag:        true,
 		},
 		{
 			name:        "Error - Failed to create a new post(Validation Check - empty space(content))",
 			inputValue:  &models.Post{Content: "", IncidentDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: "test address"},
-			expectedErr: errdefs.ErrEmptySpace,
-			mockErr:     errdefs.ErrEmptySpace,
+			expectedErr: errdefs.NewAppError(400, "input cannot be empty.", "Content"),
+			mockErr:     nil,
+			flag:        false,
 		},
 		{
 			name:        "Error - Failed to create a new post(Validation Check - empty space(incident_date))",
 			inputValue:  &models.Post{Content: "create post test", IncidentDate: invalidTime, Latitude: &lat, Longtitude: &lng, AddressText: "test address"},
-			expectedErr: errdefs.ErrEmptySpace,
-			mockErr:     errdefs.ErrEmptySpace,
+			expectedErr: errdefs.NewAppError(400, "input cannot be empty.", "IncidentDate"),
+			mockErr:     nil,
+			flag:        false,
 		},
 		{
 			name:        "Error - Failed to create a new post(Validation Check - empty space(latitude))",
 			inputValue:  &models.Post{Content: "create post test", IncidentDate: testTime, Latitude: nil, Longtitude: &lng, AddressText: "test address"},
-			expectedErr: errdefs.ErrEmptySpace,
-			mockErr:     errdefs.ErrEmptySpace,
+			expectedErr: errdefs.NewAppError(400, "input cannot be empty.", "Latitude"),
+			mockErr:     nil,
+			flag:        false,
 		},
 		{
 			name:        "Error - Failed to create a new post(Validation Check - empty space(longtitude))",
 			inputValue:  &models.Post{Content: "create post test", IncidentDate: testTime, Latitude: &lat, Longtitude: nil, AddressText: "test address"},
-			expectedErr: errdefs.ErrEmptySpace,
-			mockErr:     errdefs.ErrEmptySpace,
+			expectedErr: errdefs.NewAppError(400, "input cannot be empty.", "Longtitude"),
+			mockErr:     nil,
+			flag:        false,
 		},
 		{
-			name:        "Error - Failed to create a new post(Validation Check - future time data)",
+			name:        "Error - Failed to create a new post(Validation Check - invalid value(future time data))",
 			inputValue:  &models.Post{Content: "create post test", IncidentDate: testTime.Add(5 * time.Second), Latitude: &lat, Longtitude: &lng, AddressText: "test address"},
-			expectedErr: errdefs.ErrInvalidValue,
-			mockErr:     errdefs.ErrInvalidValue,
+			expectedErr: errdefs.NewAppError(400, "an invalid input value", []string{"IncidentDate", "future date"}),
+			mockErr:     nil,
+			flag:        false,
 		},
 		{
 			name:        "Error - Failed to create a new post(DB connection fail)",
 			inputValue:  &models.Post{Content: "create post test", IncidentDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: "test address"},
 			expectedErr: assert.AnError,
 			mockErr:     assert.AnError,
+			flag:        true,
 		},
 	}
 
@@ -199,16 +206,28 @@ func TestCreatePost(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
+
 			mockRepo := repositories.NewMockPostRepository(t)
-			mockRepo.On("CreatePost", mock.Anything, mock.AnythingOfType("sqlc.CreatePostParams")).Return(tc.mockErr)
+			if tc.flag {
+				mockRepo.On("CreatePost", mock.Anything, mock.AnythingOfType("sqlc.CreatePostParams")).Return(tc.mockErr)
+			} else {
+				mockRepo.AssertNotCalled(t, "CreatePost", mock.Anything, mock.Anything)
+			}
 
 			ctx := context.Background()
-
 			postService := services.NewPostService(mockRepo)
 			err := postService.CreatePost(ctx, tc.inputValue)
 
-			if (err != nil && tc.expectedErr == nil) || (err == nil && tc.expectedErr != nil) || (err != nil && tc.expectedErr != nil && !errors.Is(err, tc.expectedErr)) {
-				t.Errorf("예상 에러: '%v', 실제 에러: '%v'", tc.expectedErr, err)
+			if tc.expectedErr == nil {
+				if err != nil {
+					t.Errorf("예상 에러 없음, 실제 에러: %v", err)
+				}
+			} else {
+				if err == nil {
+					t.Errorf("예상 에러: '%v', 실제 에러: nil", tc.expectedErr)
+				} else if err.Error() != tc.expectedErr.Error() {
+					t.Errorf("예상 에러: '%v', 실제 에러: '%v'", tc.expectedErr, err)
+				}
 			}
 		})
 	}

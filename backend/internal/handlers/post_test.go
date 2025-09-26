@@ -253,3 +253,10 @@ func TestGetPostInfo(t *testing.T) {
 		})
 	}
 }
+
+func TestCreatePost(t *testing.T) {
+	// testcase
+	// 1. success
+	// 2. invalid value - error handling
+
+}

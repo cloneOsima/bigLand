@@ -5,16 +5,19 @@ import "fmt"
 type AppError struct {
 	StatusCode int
 	Message    string
-	ErrorInfo  interface{}
+	ErrorInfo  []string
 }
 
 func NewAppError(code int, msg string, args ...any) *AppError {
-	var m interface{}
-	if len(args) > 0 {
-		if len(args) == 1 {
-			m = args[0]
-		} else {
-			m = args
+	var m []string
+	for _, a := range args {
+		switch v := a.(type) {
+		case string:
+			m = append(m, v)
+		case []string:
+			m = append(m, v...)
+		default:
+			m = append(m, fmt.Sprint(v))
 		}
 	}
 	return &AppError{
@@ -29,6 +32,6 @@ func (e *AppError) Error() string {
 }
 
 var (
-	ErrInvalidValue = NewAppError(400, "an invalid input value")
-	ErrEmptySpace   = NewAppError(400, "an input value should not have an empty space")
+	ErrEmptySpace   = &AppError{StatusCode: 400, Message: "input cannot be empty."}
+	ErrInvalidValue = &AppError{StatusCode: 400, Message: "an invalid input value"}
 )

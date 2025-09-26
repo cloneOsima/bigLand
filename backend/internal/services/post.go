@@ -6,6 +6,7 @@ import (
 	"context"
 	"time"
 
+	errdefs "github.com/cloneOsima/bigLand/backend/internal/errors"
 	"github.com/cloneOsima/bigLand/backend/internal/models"
 	"github.com/cloneOsima/bigLand/backend/internal/repositories"
 	"github.com/cloneOsima/bigLand/backend/internal/sqlc"
@@ -32,7 +33,7 @@ func NewPostService(repo repositories.PostRepository) PostService {
 func (p *postServiceImpl) GetPosts(ctx context.Context) ([]*models.Posts, error) {
 
 	// database context should be shorter than formal response context.
-	// make new context
+	// make new db context
 	dbCtx, cancel := context.WithTimeout(ctx, defaultDBTimeout)
 	defer cancel()
 
@@ -60,20 +61,23 @@ func (p *postServiceImpl) GetPosts(ctx context.Context) ([]*models.Posts, error)
 
 func (p *postServiceImpl) GetPostInfo(ctx context.Context, postID string) (*models.Post, error) {
 
-	// 전달 받은 string 값 uuid valid test 후 UUID로 변환
+	// validation check
 	postUUID, parseErr := uuid.Parse(postID)
 	if parseErr != nil {
 		return nil, parseErr
 	}
 
+	// make new db context
 	dbCtx, cancel := context.WithTimeout(ctx, defaultDBTimeout)
 	defer cancel()
 
+	// get data by using sqlc struct
 	sqlcPost, err := p.postRepo.GetPostInfo(dbCtx, postUUID)
 	if err != nil {
 		return nil, err
 	}
 
+	// mapping sqlc struct <> models package struct
 	var result = new(models.Post)
 	result = &models.Post{
 		PostID:       sqlcPost.PostID,
@@ -91,11 +95,17 @@ func (p *postServiceImpl) GetPostInfo(ctx context.Context, postID string) (*mode
 
 func (p *postServiceImpl) CreatePost(ctx context.Context, info *models.Post) error {
 
+	// validation check
+	valErr := createValueCheck(info)
+	if valErr != nil {
+		return valErr
+	}
+
 	// generate db context
 	dbCtx, cancel := context.WithTimeout(ctx, defaultDBTimeout)
 	defer cancel()
 
-	// data mapping
+	// data mapping models package struct <> sqlc struct
 	sqlcData := sqlc.CreatePostParams{
 		Content:      info.Content,
 		IncidentDate: pgtype.Date{Time: info.IncidentDate, Valid: true},
@@ -108,6 +118,34 @@ func (p *postServiceImpl) CreatePost(ctx context.Context, info *models.Post) err
 	err := p.postRepo.CreatePost(dbCtx, sqlcData)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+// CreatePost function validation check 가 너무 길어저셔 뺴놓은 함수
+func createValueCheck(info *models.Post) *errdefs.AppError {
+	var nTime time.Time
+	switch {
+	case info.Content == "":
+		e := *errdefs.ErrEmptySpace
+		e.ErrorInfo = []string{"Content"}
+		return &e
+	case info.IncidentDate.Equal(nTime):
+		e := *errdefs.ErrEmptySpace
+		e.ErrorInfo = []string{"IncidentDate"}
+		return &e
+	case info.Latitude == nil:
+		e := *errdefs.ErrEmptySpace
+		e.ErrorInfo = []string{"Latitude"}
+		return &e
+	case info.Longtitude == nil:
+		e := *errdefs.ErrEmptySpace
+		e.ErrorInfo = []string{"Longtitude"}
+		return &e
+	case info.IncidentDate.After(time.Now()):
+		e := *errdefs.ErrInvalidValue
+		e.ErrorInfo = []string{"IncidentDate", "future date"}
+		return &e
 	}
 	return nil
 }
