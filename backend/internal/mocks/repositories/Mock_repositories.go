@@ -7,7 +7,8 @@ package repositories
 import (
 	"context"
 
-	"github.com/cloneOsima/bigLand/backend/internal/models"
+	"github.com/cloneOsima/bigLand/backend/internal/sqlc"
+	"github.com/google/uuid"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -38,28 +39,83 @@ func (_m *MockPostRepository) EXPECT() *MockPostRepository_Expecter {
 	return &MockPostRepository_Expecter{mock: &_m.Mock}
 }
 
+// CreatePost provides a mock function for the type MockPostRepository
+func (_mock *MockPostRepository) CreatePost(dbCtx context.Context, info sqlc.CreatePostParams) error {
+	ret := _mock.Called(dbCtx, info)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreatePost")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, sqlc.CreatePostParams) error); ok {
+		r0 = returnFunc(dbCtx, info)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockPostRepository_CreatePost_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreatePost'
+type MockPostRepository_CreatePost_Call struct {
+	*mock.Call
+}
+
+// CreatePost is a helper method to define mock.On call
+//   - dbCtx context.Context
+//   - info sqlc.CreatePostParams
+func (_e *MockPostRepository_Expecter) CreatePost(dbCtx interface{}, info interface{}) *MockPostRepository_CreatePost_Call {
+	return &MockPostRepository_CreatePost_Call{Call: _e.mock.On("CreatePost", dbCtx, info)}
+}
+
+func (_c *MockPostRepository_CreatePost_Call) Run(run func(dbCtx context.Context, info sqlc.CreatePostParams)) *MockPostRepository_CreatePost_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 sqlc.CreatePostParams
+		if args[1] != nil {
+			arg1 = args[1].(sqlc.CreatePostParams)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockPostRepository_CreatePost_Call) Return(err error) *MockPostRepository_CreatePost_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockPostRepository_CreatePost_Call) RunAndReturn(run func(dbCtx context.Context, info sqlc.CreatePostParams) error) *MockPostRepository_CreatePost_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetPostInfo provides a mock function for the type MockPostRepository
-func (_mock *MockPostRepository) GetPostInfo(dbCtx context.Context) (*models.Post, error) {
-	ret := _mock.Called(dbCtx)
+func (_mock *MockPostRepository) GetPostInfo(ctx context.Context, postID uuid.UUID) (sqlc.GetPostInfoRow, error) {
+	ret := _mock.Called(ctx, postID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetPostInfo")
 	}
 
-	var r0 *models.Post
+	var r0 sqlc.GetPostInfoRow
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context) (*models.Post, error)); ok {
-		return returnFunc(dbCtx)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) (sqlc.GetPostInfoRow, error)); ok {
+		return returnFunc(ctx, postID)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context) *models.Post); ok {
-		r0 = returnFunc(dbCtx)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) sqlc.GetPostInfoRow); ok {
+		r0 = returnFunc(ctx, postID)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*models.Post)
-		}
+		r0 = ret.Get(0).(sqlc.GetPostInfoRow)
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = returnFunc(dbCtx)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = returnFunc(ctx, postID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -72,52 +128,58 @@ type MockPostRepository_GetPostInfo_Call struct {
 }
 
 // GetPostInfo is a helper method to define mock.On call
-//   - dbCtx context.Context
-func (_e *MockPostRepository_Expecter) GetPostInfo(dbCtx interface{}) *MockPostRepository_GetPostInfo_Call {
-	return &MockPostRepository_GetPostInfo_Call{Call: _e.mock.On("GetPostInfo", dbCtx)}
+//   - ctx context.Context
+//   - postID uuid.UUID
+func (_e *MockPostRepository_Expecter) GetPostInfo(ctx interface{}, postID interface{}) *MockPostRepository_GetPostInfo_Call {
+	return &MockPostRepository_GetPostInfo_Call{Call: _e.mock.On("GetPostInfo", ctx, postID)}
 }
 
-func (_c *MockPostRepository_GetPostInfo_Call) Run(run func(dbCtx context.Context)) *MockPostRepository_GetPostInfo_Call {
+func (_c *MockPostRepository_GetPostInfo_Call) Run(run func(ctx context.Context, postID uuid.UUID)) *MockPostRepository_GetPostInfo_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
 		run(
 			arg0,
+			arg1,
 		)
 	})
 	return _c
 }
 
-func (_c *MockPostRepository_GetPostInfo_Call) Return(post *models.Post, err error) *MockPostRepository_GetPostInfo_Call {
-	_c.Call.Return(post, err)
+func (_c *MockPostRepository_GetPostInfo_Call) Return(getPostInfoRow sqlc.GetPostInfoRow, err error) *MockPostRepository_GetPostInfo_Call {
+	_c.Call.Return(getPostInfoRow, err)
 	return _c
 }
 
-func (_c *MockPostRepository_GetPostInfo_Call) RunAndReturn(run func(dbCtx context.Context) (*models.Post, error)) *MockPostRepository_GetPostInfo_Call {
+func (_c *MockPostRepository_GetPostInfo_Call) RunAndReturn(run func(ctx context.Context, postID uuid.UUID) (sqlc.GetPostInfoRow, error)) *MockPostRepository_GetPostInfo_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetPosts provides a mock function for the type MockPostRepository
-func (_mock *MockPostRepository) GetPosts(ctx context.Context) ([]*models.Posts, error) {
+func (_mock *MockPostRepository) GetPosts(ctx context.Context) ([]sqlc.GetPostsRow, error) {
 	ret := _mock.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetPosts")
 	}
 
-	var r0 []*models.Posts
+	var r0 []sqlc.GetPostsRow
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context) ([]*models.Posts, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context) ([]sqlc.GetPostsRow, error)); ok {
 		return returnFunc(ctx)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context) []*models.Posts); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context) []sqlc.GetPostsRow); ok {
 		r0 = returnFunc(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*models.Posts)
+			r0 = ret.Get(0).([]sqlc.GetPostsRow)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
@@ -152,12 +214,12 @@ func (_c *MockPostRepository_GetPosts_Call) Run(run func(ctx context.Context)) *
 	return _c
 }
 
-func (_c *MockPostRepository_GetPosts_Call) Return(postss []*models.Posts, err error) *MockPostRepository_GetPosts_Call {
-	_c.Call.Return(postss, err)
+func (_c *MockPostRepository_GetPosts_Call) Return(getPostsRows []sqlc.GetPostsRow, err error) *MockPostRepository_GetPosts_Call {
+	_c.Call.Return(getPostsRows, err)
 	return _c
 }
 
-func (_c *MockPostRepository_GetPosts_Call) RunAndReturn(run func(ctx context.Context) ([]*models.Posts, error)) *MockPostRepository_GetPosts_Call {
+func (_c *MockPostRepository_GetPosts_Call) RunAndReturn(run func(ctx context.Context) ([]sqlc.GetPostsRow, error)) *MockPostRepository_GetPosts_Call {
 	_c.Call.Return(run)
 	return _c
 }

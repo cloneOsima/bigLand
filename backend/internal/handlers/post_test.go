@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
+	errdefs "github.com/cloneOsima/bigLand/backend/internal/errors"
 	"github.com/cloneOsima/bigLand/backend/internal/handlers"
 	"github.com/cloneOsima/bigLand/backend/internal/mocks/services"
 	"github.com/cloneOsima/bigLand/backend/internal/models"
@@ -18,17 +20,17 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-var testUUID uuid.UUID
-var testTime time.Time = time.Now()
-var testLocationText []byte = []byte("testlocation")
-var otherErrors error = fmt.Errorf("Someting goes wrong except ctx.Deadline and ctx.Canceled.")
-var sampleText string = "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
+var (
+	lat              = 0.1
+	lng              = 0.2
+	testUUID, _      = uuid.NewUUID()
+	testTime         = time.Now()
+	testLocationText = "testlocation"
+	sampleText       = "sample text for testing"
+)
 
 func TestGetPosts(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-
-	testUUID, _ := uuid.NewUUID()
-
 	testCases := []struct {
 		name           string
 		svcReturn      []*models.Posts
@@ -39,14 +41,14 @@ func TestGetPosts(t *testing.T) {
 		{
 			name: "Success - Formal Response",
 			svcReturn: []*models.Posts{
-				{PostId: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: sampleText, Location: testLocationText},
-				{PostId: testUUID, PostedDate: testTime, Latitude: 0.02, Longtitude: 0.01, AddressText: sampleText, Location: testLocationText},
+				{PostID: testUUID, PostedDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: sampleText, Location: []byte(testLocationText)},
+				{PostID: testUUID, PostedDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: sampleText, Location: []byte(testLocationText)},
 			},
 			returnErr:      nil,
 			expectedStatus: http.StatusOK,
 			expectedBody: []*models.Posts{
-				{PostId: testUUID, PostedDate: testTime, Latitude: 0.01, Longtitude: 0.02, AddressText: sampleText, Location: testLocationText},
-				{PostId: testUUID, PostedDate: testTime, Latitude: 0.02, Longtitude: 0.01, AddressText: sampleText, Location: testLocationText},
+				{PostID: testUUID, PostedDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: sampleText, Location: []byte(testLocationText)},
+				{PostID: testUUID, PostedDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: sampleText, Location: []byte(testLocationText)},
 			},
 		},
 		{
@@ -66,7 +68,7 @@ func TestGetPosts(t *testing.T) {
 		{
 			name:           "Error - InternalServerError",
 			svcReturn:      nil,
-			returnErr:      otherErrors,
+			returnErr:      errors.New("otherErrors"),
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   nil,
 		},
@@ -103,17 +105,22 @@ func TestGetPosts(t *testing.T) {
 				}
 
 				for i := range got {
-					if got[i].PostId != tc.expectedBody[i].PostId {
-						t.Errorf("postId mismatch: expected %v, got %v", tc.expectedBody[i].PostId, got[i].PostId)
+					expectedLat := *tc.expectedBody[i].Latitude
+					expectedLng := *tc.expectedBody[i].Longtitude
+					gotLat := *got[i].Latitude
+					gotLng := *got[i].Longtitude
+
+					if got[i].PostID != tc.expectedBody[i].PostID {
+						t.Errorf("postId mismatch: expected %v, got %v", tc.expectedBody[i].PostID, got[i].PostID)
 					}
 					if !got[i].PostedDate.Equal(tc.expectedBody[i].PostedDate) {
 						t.Errorf("postedDate mismatch: expected %v, got %v", tc.expectedBody[i].PostedDate, got[i].PostedDate)
 					}
-					if got[i].Latitude != tc.expectedBody[i].Latitude {
-						t.Errorf("latitude mismatch: expected %v, got %v", tc.expectedBody[i].Latitude, got[i].Latitude)
+					if expectedLat != gotLat {
+						t.Errorf("latitude mismatch: expected %v, got %v", expectedLat, gotLat)
 					}
-					if got[i].Longtitude != tc.expectedBody[i].Longtitude {
-						t.Errorf("longtitude mismatch: expected %v, got %v", tc.expectedBody[i].Longtitude, got[i].Longtitude)
+					if expectedLng != gotLng {
+						t.Errorf("longtitude mismatch: expected %v, got %v", expectedLat, gotLat)
 					}
 					if got[i].AddressText != tc.expectedBody[i].AddressText {
 						t.Errorf("addressText mismatch: expected %v, got %v", tc.expectedBody[i].AddressText, got[i].AddressText)
@@ -130,7 +137,6 @@ func TestGetPosts(t *testing.T) {
 func TestGetPostInfo(t *testing.T) {
 
 	testUUID, _ := uuid.NewUUID()
-
 	testCases := []struct {
 		name           string
 		svcReturn      *models.Post
@@ -141,31 +147,30 @@ func TestGetPostInfo(t *testing.T) {
 		{
 			name: "Success - Formal Result(GetPostInfo)",
 			svcReturn: &models.Post{
-				PostId:       testUUID,
+				PostID:       testUUID,
 				Content:      "test-content",
 				IncidentDate: testTime,
 				PostedDate:   testTime,
-				Latitude:     0.01,
-				Longtitude:   0.02,
+				Latitude:     &lat,
+				Longtitude:   &lng,
 				AddressText:  sampleText,
-				Location:     testLocationText,
+				Location:     []byte(testLocationText),
 				IsActive:     true,
 			},
 			returnErr:      nil,
 			expectedStatus: http.StatusOK,
 			expectedBody: models.Post{
-				PostId:       testUUID,
+				PostID:       testUUID,
 				Content:      "test-content",
 				IncidentDate: testTime,
 				PostedDate:   testTime,
-				Latitude:     0.01,
-				Longtitude:   0.02,
+				Latitude:     &lat,
+				Longtitude:   &lng,
 				AddressText:  sampleText,
-				Location:     testLocationText,
+				Location:     []byte(testLocationText),
 				IsActive:     true,
 			},
 		},
-
 		{
 			name:           "Error - Context RequestTimeout(GetPostInfo)",
 			svcReturn:      nil,
@@ -183,7 +188,7 @@ func TestGetPostInfo(t *testing.T) {
 		{
 			name:           "Error - InternalServerError(GetPostInfo)",
 			svcReturn:      nil,
-			returnErr:      otherErrors,
+			returnErr:      errors.New("otherErrors"),
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   models.Post{},
 		},
@@ -195,7 +200,7 @@ func TestGetPostInfo(t *testing.T) {
 			t.Parallel()
 
 			mockSvc := services.NewMockPostService(t)
-			mockSvc.On("GetPostInfo", mock.Anything).Return(tc.svcReturn, tc.returnErr)
+			mockSvc.On("GetPostInfo", mock.Anything, testUUID.String()).Return(tc.svcReturn, tc.returnErr)
 			url := fmt.Sprintf("/post/%s", testUUID)
 
 			w := httptest.NewRecorder()
@@ -204,6 +209,9 @@ func TestGetPostInfo(t *testing.T) {
 			req.Header.Set("X-Request-ID", "test-request-id")
 
 			c.Request = req
+			c.Params = gin.Params{
+				{Key: "id", Value: testUUID.String()},
+			}
 
 			handler := handlers.NewPostHandler(mockSvc)
 			handler.GetPostInfo(c)
@@ -214,8 +222,8 @@ func TestGetPostInfo(t *testing.T) {
 				if err := json.Unmarshal(w.Body.Bytes(), &got); err != nil {
 					t.Fatalf("failed to unmarshal response body: %v", err)
 				}
-				if got.PostId != tc.expectedBody.PostId {
-					t.Errorf("postId mismatch: expected %v, got %v", tc.expectedBody.PostId, got.PostId)
+				if got.PostID != tc.expectedBody.PostID {
+					t.Errorf("postId mismatch: expected %v, got %v", tc.expectedBody.PostID, got.PostID)
 				}
 				if !got.PostedDate.Equal(tc.expectedBody.PostedDate) {
 					t.Errorf("postedDate mismatch: expected %v, got %v", tc.expectedBody.PostedDate, got.PostedDate)
@@ -241,6 +249,95 @@ func TestGetPostInfo(t *testing.T) {
 				if got.IsActive != tc.expectedBody.IsActive {
 					t.Errorf("isActive mismatch: expected %v, got %v", tc.expectedBody.IsActive, got.IsActive)
 				}
+			}
+		})
+	}
+}
+
+// CreatePostHandler test
+// test cases
+// 1. success
+// 2. fail - context timeout, context cancel, internal server error
+func TestCreatePost(t *testing.T) {
+	jsonValue := `{
+				"content": "create post test content",
+				"incident_date": "2025-09-26T03:55:44.564Z",
+				"latitude": 0.0,
+				"longtitude": 0.1,
+				"address_text": "create post test address"
+			}`
+	testCases := []struct {
+		name           string
+		jsonBody       string
+		returnErr      error
+		expectedStatus int
+	}{
+		{
+			name:           "Success - create new post",
+			jsonBody:       jsonValue,
+			returnErr:      nil,
+			expectedStatus: http.StatusOK,
+		}, {
+			name:           "Error - Context RequestTimeout(CreatePost)",
+			jsonBody:       jsonValue,
+			returnErr:      context.DeadlineExceeded,
+			expectedStatus: http.StatusRequestTimeout,
+		}, {
+			name:           "Error - Context Canceled(CreatePost)",
+			jsonBody:       jsonValue,
+			returnErr:      context.Canceled,
+			expectedStatus: http.StatusRequestTimeout,
+		}, {
+			name:           "Error - InternalServerError(CreatePost)",
+			jsonBody:       jsonValue,
+			returnErr:      errors.New("internal error is occurred"),
+			expectedStatus: http.StatusInternalServerError,
+		}, {
+			name: "Error - Invalid value(Empty Space - CreatePost)",
+			jsonBody: `{
+				"content": "",
+				"incident_date": "2025-09-26T03:55:44.564Z",
+				"latitude": 0.0,
+				"longtitude": 0.1,
+				"address_text": "create post test address"
+			}`,
+			returnErr:      errdefs.ErrEmptySpace,
+			expectedStatus: http.StatusBadRequest,
+		}, {
+			name: "Error - Invalid value(wrong date - CreatePost)",
+			jsonBody: `{
+				"content": "create post test content",
+				"incident_date": "2025-09-28T03:55:44.564Z",
+				"latitude": 0.0,
+				"longtitude": 0.1,
+				"address_text": "create post test address"
+			}`,
+			returnErr:      errdefs.ErrInvalidValue,
+			expectedStatus: http.StatusBadRequest,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			mockSvc := services.NewMockPostService(t)
+			mockSvc.On("CreatePost", mock.Anything, mock.AnythingOfType("*models.Post")).Return(tc.returnErr)
+
+			w := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(w)
+
+			req, _ := http.NewRequest(http.MethodPost, "/post", bytes.NewBuffer([]byte(tc.jsonBody)))
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("X-Request-ID", "test-request-id")
+			c.Request = req
+
+			handler := handlers.NewPostHandler(mockSvc)
+			handler.CreatePost(c)
+
+			if w.Code != tc.expectedStatus {
+				t.Errorf("expected status %d, got %d", tc.expectedStatus, w.Code)
 			}
 		})
 	}
