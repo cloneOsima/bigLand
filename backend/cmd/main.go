@@ -13,8 +13,11 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+const (
+	portNo = 10001
+)
+
 func main() {
-	port := 10001
 	// Initiate services code
 
 	// Create DB connection pool
@@ -33,21 +36,21 @@ func main() {
 
 	r := server.SetupRouter(handler)
 
-	addr := fmt.Sprintf(":%d", port) // ":10001" 형태로 문자열 생성
-	log.Printf("Server starting on http://localhost:%d", port)
+	addr := fmt.Sprintf(":%d", portNo) // ":10001" 형태로 문자열 생성
+	log.Printf("Server starting on http://localhost:%d", portNo)
 	r.Run(addr)
 }
 
-func setUp(pool *pgxpool.Pool) (handlers.Handler, error) {
+func setUp(pool *pgxpool.Pool) (*handlers.Handlers, error) {
 
 	// repo 초기화
-	postRepo := repositories.NewPostRepository(pool)
+	repo := repositories.InitRepo(pool)
 
 	// service 초기화
-	postSvc := services.NewPostService(postRepo)
+	svc := services.InitSvc(repo)
 
 	// handler 초기화
-	handler := handlers.NewPostHandler(postSvc)
+	handler := handlers.InitHandler(svc)
 	if handler == nil {
 		return nil, fmt.Errorf("failed to create handler")
 	}

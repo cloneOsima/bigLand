@@ -28,14 +28,14 @@ var (
 func TestGetPosts(t *testing.T) {
 	tests := []struct {
 		name        string
-		mockReturn  []sqlc.GetPostsRow
+		mockReturn  []sqlc.SelectPostsRow
 		mockErr     error
 		expectPosts []*models.Posts
 		expectedErr error
 	}{
 		{
 			name: "Success - Returns posts",
-			mockReturn: []sqlc.GetPostsRow{
+			mockReturn: []sqlc.SelectPostsRow{
 				{PostID: testUUID, PostedDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: "test", Location: []byte(testLocationText)},
 				{PostID: testUUID, PostedDate: testTime.Add(10 * time.Minute), Latitude: &lat, Longtitude: &lng, AddressText: "test2", Location: []byte(testLocationText)}},
 			mockErr: nil,
@@ -53,7 +53,7 @@ func TestGetPosts(t *testing.T) {
 		},
 		{
 			name:        "Success - No posts found (empty slice)",
-			mockReturn:  []sqlc.GetPostsRow{},
+			mockReturn:  []sqlc.SelectPostsRow{},
 			mockErr:     nil,
 			expectPosts: nil,
 			expectedErr: nil,
@@ -65,7 +65,7 @@ func TestGetPosts(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			mockRepo := repositories.NewMockPostRepository(t)
-			mockRepo.On("GetPosts", mock.Anything).Return(tc.mockReturn, tc.mockErr)
+			mockRepo.On("SelectPosts", mock.Anything).Return(tc.mockReturn, tc.mockErr)
 
 			postService := services.NewPostService(mockRepo)
 			result, err := postService.GetPosts(context.Background())
@@ -89,28 +89,28 @@ func TestGetPostInfo(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		mockReturn  sqlc.GetPostInfoRow
+		mockReturn  sqlc.SelectPostInfoRow
 		mockErr     error
 		expectPost  *models.Post
 		expectedErr error
 	}{
 		{
 			name:        "Success - Return post info",
-			mockReturn:  sqlc.GetPostInfoRow{PostID: testUUID, Content: "test-content", IncidentDate: pgDate, PostedDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: "test", Location: []byte(testLocationText)},
+			mockReturn:  sqlc.SelectPostInfoRow{PostID: testUUID, Content: "test-content", IncidentDate: pgDate, PostedDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: "test", Location: []byte(testLocationText)},
 			mockErr:     nil,
 			expectPost:  &models.Post{PostID: testUUID, Content: "test-content", IncidentDate: testDate, PostedDate: testTime, Latitude: &lat, Longtitude: &lng, AddressText: "test", Location: []byte(testLocationText)},
 			expectedErr: nil,
 		},
 		{
 			name:        "Error - Failed to query",
-			mockReturn:  sqlc.GetPostInfoRow{},
+			mockReturn:  sqlc.SelectPostInfoRow{},
 			mockErr:     assert.AnError,
 			expectPost:  &models.Post{},
 			expectedErr: assert.AnError,
 		},
 		{
 			name:        "Success - No post found (empty row)",
-			mockReturn:  sqlc.GetPostInfoRow{},
+			mockReturn:  sqlc.SelectPostInfoRow{},
 			mockErr:     nil,
 			expectPost:  &models.Post{},
 			expectedErr: nil,
@@ -122,7 +122,7 @@ func TestGetPostInfo(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			mockRepo := repositories.NewMockPostRepository(t)
-			mockRepo.On("GetPostInfo", mock.Anything, testUUID).Return(tc.mockReturn, tc.mockErr)
+			mockRepo.On("SelectPostInfo", mock.Anything, testUUID).Return(tc.mockReturn, tc.mockErr)
 
 			ctx := context.Background()
 
@@ -225,14 +225,14 @@ func TestCreatePost(t *testing.T) {
 
 			mockRepo := repositories.NewMockPostRepository(t)
 			if tc.flag {
-				mockRepo.On("CreatePost", mock.Anything, mock.AnythingOfType("sqlc.CreatePostParams")).Return(tc.mockErr)
+				mockRepo.On("InsertNewPost", mock.Anything, mock.AnythingOfType("sqlc.InsertNewPostParams")).Return(tc.mockErr)
 			} else {
 				mockRepo.AssertNotCalled(t, "CreatePost", mock.Anything, mock.Anything)
 			}
 
 			ctx := context.Background()
 			postService := services.NewPostService(mockRepo)
-			err := postService.CreatePost(ctx, tc.inputValue)
+			err := postService.NewPost(ctx, tc.inputValue)
 
 			if tc.expectedErr == nil {
 				if err != nil {

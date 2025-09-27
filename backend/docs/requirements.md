@@ -1,11 +1,12 @@
 # Required functions
 - get post list (50 limit)  : fin
 - get post info             : fin
-- create a new post         : in progress
+- create a new post         : fin 
 - comment
-- delete post (admin)
+- delete post (admin)       
 - delete comment (admin)
-- create a new account
+- create a new account      : in progress
+- user login
 
 ## DDL for creating table 
 ```
@@ -68,10 +69,23 @@ CREATE TABLE comments (
 - https://medium.com/@lhc1990/solving-supabase-ipv6-connection-issues-the-complete-developers-guide-96f8481f42c1    // recommend to read it!
 
 # 新着情報 read function requirements
+- GET Function: return list of posts (limit 50)
+- Get 50 post list ordered by posted date
 
 ## Required dataset
+#### post list dataset
+dataset for list(recently added post) 
+- post_id : 투고 id 
+- posted_date : 투고일
+- address_text : 사고지 주소
 
-#### post dataset
+# Post read function requirements
+- GET function: return detailed information about the post
+- Get postID from http request + Search database by using postID + Return result 
+- UUID validation check is needed
+
+## Required dataset
+#### single post dataset
 dataset for a single post(detailed information)
 - post_id : 투고 id
 - content : 투고 내용
@@ -83,15 +97,31 @@ dataset for a single post(detailed information)
 - location : gis 데이터 
 - is_active : 활성화/비활성화 플래그
 
-#### post list dataset
-dataset for list(recently added post) 
-- post_id : 투고 id 
-- posted_date : 투고일
+# Post 投稿 function requirementes
+- POST function : create new post
+- Insert new row at post table by using given input value 
+- Input value validation check is needed
+
+## Required dataset
+#### post dataset
+- content : 투고 내용
+- incident_date : 사고 발생일
+- latitude : 위도
+- longitude : 경도 
 - address_text : 사고지 주소
 
-# Post 投稿 function requirementes
+# ユーザー 加入 function requirementes
+- POST function : create new user account
+- Insert new row at post table by using given input value 
+- Input value validation check is needed
 
-## 
+## Required dataset
+#### post dataset
+- content : 투고 내용
+- incident_date : 사고 발생일
+- latitude : 위도
+- longitude : 경도 
+- address_text : 사고지 주소
 
 # Viewport 
 

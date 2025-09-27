@@ -13,7 +13,38 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createPost = `-- name: CreatePost :exec
+const insertNewAccount = `-- name: InsertNewAccount :exec
+INSERT INTO users (
+    username,
+    email,
+    password_hash,
+    last_login_at
+) VALUES (
+    $1,
+    $2,
+    $3,
+    $4
+)
+`
+
+type InsertNewAccountParams struct {
+	Username     string
+	Email        string
+	PasswordHash string
+	LastLoginAt  time.Time
+}
+
+func (q *Queries) InsertNewAccount(ctx context.Context, arg InsertNewAccountParams) error {
+	_, err := q.db.Exec(ctx, insertNewAccount,
+		arg.Username,
+		arg.Email,
+		arg.PasswordHash,
+		arg.LastLoginAt,
+	)
+	return err
+}
+
+const insertNewPost = `-- name: InsertNewPost :exec
 INSERT INTO posts (
     content,
     incident_date,
@@ -31,7 +62,7 @@ INSERT INTO posts (
 )
 `
 
-type CreatePostParams struct {
+type InsertNewPostParams struct {
 	Content      string
 	IncidentDate pgtype.Date
 	Latitude     *float64
@@ -39,8 +70,8 @@ type CreatePostParams struct {
 	AddressText  string
 }
 
-func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) error {
-	_, err := q.db.Exec(ctx, createPost,
+func (q *Queries) InsertNewPost(ctx context.Context, arg InsertNewPostParams) error {
+	_, err := q.db.Exec(ctx, insertNewPost,
 		arg.Content,
 		arg.IncidentDate,
 		arg.Latitude,
@@ -50,14 +81,14 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) error {
 	return err
 }
 
-const getPostInfo = `-- name: GetPostInfo :one
+const selectPostInfo = `-- name: SelectPostInfo :one
 SELECT post_id, content, incident_date, posted_date, address_text, latitude, longtitude, location
 FROM posts
 WHERE is_active = true
 AND post_id = $1
 `
 
-type GetPostInfoRow struct {
+type SelectPostInfoRow struct {
 	PostID       uuid.UUID
 	Content      string
 	IncidentDate pgtype.Date
@@ -68,9 +99,9 @@ type GetPostInfoRow struct {
 	Location     []byte
 }
 
-func (q *Queries) GetPostInfo(ctx context.Context, postID uuid.UUID) (GetPostInfoRow, error) {
-	row := q.db.QueryRow(ctx, getPostInfo, postID)
-	var i GetPostInfoRow
+func (q *Queries) SelectPostInfo(ctx context.Context, postID uuid.UUID) (SelectPostInfoRow, error) {
+	row := q.db.QueryRow(ctx, selectPostInfo, postID)
+	var i SelectPostInfoRow
 	err := row.Scan(
 		&i.PostID,
 		&i.Content,
@@ -84,7 +115,7 @@ func (q *Queries) GetPostInfo(ctx context.Context, postID uuid.UUID) (GetPostInf
 	return i, err
 }
 
-const getPosts = `-- name: GetPosts :many
+const selectPosts = `-- name: SelectPosts :many
 SELECT post_id, posted_date, address_text, latitude, longtitude, location
 FROM posts
 WHERE is_active = true
@@ -92,7 +123,7 @@ ORDER BY posted_date DESC
 LIMIT 50
 `
 
-type GetPostsRow struct {
+type SelectPostsRow struct {
 	PostID      uuid.UUID
 	PostedDate  time.Time
 	AddressText string
@@ -101,15 +132,15 @@ type GetPostsRow struct {
 	Location    []byte
 }
 
-func (q *Queries) GetPosts(ctx context.Context) ([]GetPostsRow, error) {
-	rows, err := q.db.Query(ctx, getPosts)
+func (q *Queries) SelectPosts(ctx context.Context) ([]SelectPostsRow, error) {
+	rows, err := q.db.Query(ctx, selectPosts)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetPostsRow
+	var items []SelectPostsRow
 	for rows.Next() {
-		var i GetPostsRow
+		var i SelectPostsRow
 		if err := rows.Scan(
 			&i.PostID,
 			&i.PostedDate,
@@ -126,4 +157,23 @@ func (q *Queries) GetPosts(ctx context.Context) ([]GetPostsRow, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const selectUser = `-- name: SelectUser :one
+SELECT username, email, password_hash
+FROM users
+WHERE username = $1
+`
+
+type SelectUserRow struct {
+	Username     string
+	Email        string
+	PasswordHash string
+}
+
+func (q *Queries) SelectUser(ctx context.Context, username string) (SelectUserRow, error) {
+	row := q.db.QueryRow(ctx, selectUser, username)
+	var i SelectUserRow
+	err := row.Scan(&i.Username, &i.Email, &i.PasswordHash)
+	return i, err
 }

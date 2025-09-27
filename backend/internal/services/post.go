@@ -17,7 +17,7 @@ import (
 type PostService interface {
 	GetPosts(ctx context.Context) ([]*models.Posts, error)
 	GetPostInfo(ctx context.Context, postID string) (*models.Post, error)
-	CreatePost(ctx context.Context, inputValue *models.Post) error
+	NewPost(ctx context.Context, inputValue *models.Post) error
 }
 
 type postServiceImpl struct {
@@ -38,7 +38,7 @@ func (p *postServiceImpl) GetPosts(ctx context.Context) ([]*models.Posts, error)
 	defer cancel()
 
 	// get data by using sqlc struct
-	sqlcPosts, err := p.postRepo.GetPosts(dbCtx)
+	sqlcPosts, err := p.postRepo.SelectPosts(dbCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (p *postServiceImpl) GetPostInfo(ctx context.Context, postID string) (*mode
 	defer cancel()
 
 	// get data by using sqlc struct
-	sqlcPost, err := p.postRepo.GetPostInfo(dbCtx, postUUID)
+	sqlcPost, err := p.postRepo.SelectPostInfo(dbCtx, postUUID)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (p *postServiceImpl) GetPostInfo(ctx context.Context, postID string) (*mode
 	return result, nil
 }
 
-func (p *postServiceImpl) CreatePost(ctx context.Context, info *models.Post) error {
+func (p *postServiceImpl) NewPost(ctx context.Context, info *models.Post) error {
 
 	// validation check
 	valErr := createValueCheck(info)
@@ -106,7 +106,7 @@ func (p *postServiceImpl) CreatePost(ctx context.Context, info *models.Post) err
 	defer cancel()
 
 	// data mapping models package struct <> sqlc struct
-	sqlcData := sqlc.CreatePostParams{
+	sqlcData := sqlc.InsertNewPostParams{
 		Content:      info.Content,
 		IncidentDate: pgtype.Date{Time: info.IncidentDate, Valid: true},
 		Latitude:     info.Latitude,
@@ -115,7 +115,7 @@ func (p *postServiceImpl) CreatePost(ctx context.Context, info *models.Post) err
 	}
 
 	// repo connection
-	err := p.postRepo.CreatePost(dbCtx, sqlcData)
+	err := p.postRepo.InsertNewPost(dbCtx, sqlcData)
 	if err != nil {
 		return err
 	}
