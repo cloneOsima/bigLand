@@ -19,6 +19,6 @@ func NewUserService(repo repositories.UserRepository) UserService {
 }
 
 func (u *userServiceImpl) SignUp(ctx context.Context) error {
-
+	
 	return nil
 }
