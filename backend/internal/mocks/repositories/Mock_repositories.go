@@ -295,6 +295,72 @@ func (_c *MockUserRepository_DeleteAccount_Call) RunAndReturn(run func() error) 
 	return _c
 }
 
+// InsertNewAccount provides a mock function for the type MockUserRepository
+func (_mock *MockUserRepository) InsertNewAccount(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) (sqlc.SelectUserRow, error) {
+	ret := _mock.Called(dbCtx, newAccount)
+
+	if len(ret) == 0 {
+		panic("no return value specified for InsertNewAccount")
+	}
+
+	var r0 sqlc.SelectUserRow
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, sqlc.InsertNewAccountParams) (sqlc.SelectUserRow, error)); ok {
+		return returnFunc(dbCtx, newAccount)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, sqlc.InsertNewAccountParams) sqlc.SelectUserRow); ok {
+		r0 = returnFunc(dbCtx, newAccount)
+	} else {
+		r0 = ret.Get(0).(sqlc.SelectUserRow)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, sqlc.InsertNewAccountParams) error); ok {
+		r1 = returnFunc(dbCtx, newAccount)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockUserRepository_InsertNewAccount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'InsertNewAccount'
+type MockUserRepository_InsertNewAccount_Call struct {
+	*mock.Call
+}
+
+// InsertNewAccount is a helper method to define mock.On call
+//   - dbCtx context.Context
+//   - newAccount sqlc.InsertNewAccountParams
+func (_e *MockUserRepository_Expecter) InsertNewAccount(dbCtx interface{}, newAccount interface{}) *MockUserRepository_InsertNewAccount_Call {
+	return &MockUserRepository_InsertNewAccount_Call{Call: _e.mock.On("InsertNewAccount", dbCtx, newAccount)}
+}
+
+func (_c *MockUserRepository_InsertNewAccount_Call) Run(run func(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams)) *MockUserRepository_InsertNewAccount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 sqlc.InsertNewAccountParams
+		if args[1] != nil {
+			arg1 = args[1].(sqlc.InsertNewAccountParams)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockUserRepository_InsertNewAccount_Call) Return(selectUserRow sqlc.SelectUserRow, err error) *MockUserRepository_InsertNewAccount_Call {
+	_c.Call.Return(selectUserRow, err)
+	return _c
+}
+
+func (_c *MockUserRepository_InsertNewAccount_Call) RunAndReturn(run func(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) (sqlc.SelectUserRow, error)) *MockUserRepository_InsertNewAccount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Login provides a mock function for the type MockUserRepository
 func (_mock *MockUserRepository) Login() error {
 	ret := _mock.Called()
@@ -379,72 +445,6 @@ func (_c *MockUserRepository_Logout_Call) Return(err error) *MockUserRepository_
 }
 
 func (_c *MockUserRepository_Logout_Call) RunAndReturn(run func() error) *MockUserRepository_Logout_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// NewAccount provides a mock function for the type MockUserRepository
-func (_mock *MockUserRepository) NewAccount(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) (sqlc.SelectUserRow, error) {
-	ret := _mock.Called(dbCtx, newAccount)
-
-	if len(ret) == 0 {
-		panic("no return value specified for NewAccount")
-	}
-
-	var r0 sqlc.SelectUserRow
-	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, sqlc.InsertNewAccountParams) (sqlc.SelectUserRow, error)); ok {
-		return returnFunc(dbCtx, newAccount)
-	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, sqlc.InsertNewAccountParams) sqlc.SelectUserRow); ok {
-		r0 = returnFunc(dbCtx, newAccount)
-	} else {
-		r0 = ret.Get(0).(sqlc.SelectUserRow)
-	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, sqlc.InsertNewAccountParams) error); ok {
-		r1 = returnFunc(dbCtx, newAccount)
-	} else {
-		r1 = ret.Error(1)
-	}
-	return r0, r1
-}
-
-// MockUserRepository_NewAccount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'NewAccount'
-type MockUserRepository_NewAccount_Call struct {
-	*mock.Call
-}
-
-// NewAccount is a helper method to define mock.On call
-//   - dbCtx context.Context
-//   - newAccount sqlc.InsertNewAccountParams
-func (_e *MockUserRepository_Expecter) NewAccount(dbCtx interface{}, newAccount interface{}) *MockUserRepository_NewAccount_Call {
-	return &MockUserRepository_NewAccount_Call{Call: _e.mock.On("NewAccount", dbCtx, newAccount)}
-}
-
-func (_c *MockUserRepository_NewAccount_Call) Run(run func(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams)) *MockUserRepository_NewAccount_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		var arg1 sqlc.InsertNewAccountParams
-		if args[1] != nil {
-			arg1 = args[1].(sqlc.InsertNewAccountParams)
-		}
-		run(
-			arg0,
-			arg1,
-		)
-	})
-	return _c
-}
-
-func (_c *MockUserRepository_NewAccount_Call) Return(selectUserRow sqlc.SelectUserRow, err error) *MockUserRepository_NewAccount_Call {
-	_c.Call.Return(selectUserRow, err)
-	return _c
-}
-
-func (_c *MockUserRepository_NewAccount_Call) RunAndReturn(run func(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) (sqlc.SelectUserRow, error)) *MockUserRepository_NewAccount_Call {
 	_c.Call.Return(run)
 	return _c
 }
