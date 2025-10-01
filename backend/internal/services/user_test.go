@@ -24,6 +24,11 @@ var (
 	}
 )
 
+// 회원 가입 테스트 케이스
+// 1. 성공 - 정상 가입
+// 2. 실패 - 입력값 검증 실패 (repo 호출 x)
+// 3. 실패 - context timeout
+// 4. 실패 - DB 저장 결과 검증 실패 (데이터 불일치)
 func TestSignUp(t *testing.T) {
 	testCases := []struct {
 		name         string
@@ -40,6 +45,9 @@ func TestSignUp(t *testing.T) {
 			expectedErr:  nil,
 			returnedErr:  nil,
 			flag:         true,
+		},
+		{
+			name: "Error - Validation failed - ",
 		},
 	}
 
@@ -71,7 +79,6 @@ func TestSignUp(t *testing.T) {
 					t.Errorf("예상 에러: '%v', 실제 에러: '%v'", tc.expectedErr, err)
 				}
 			}
-
 		})
 	}
 }
