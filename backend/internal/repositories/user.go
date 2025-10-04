@@ -10,7 +10,7 @@ import (
 type UserRepository interface {
 	Login() error
 	Logout() error
-	InsertNewAccount(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) (sqlc.SelectUserRow, error)
+	InsertNewAccount(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) error
 	DeleteAccount() error
 }
 
@@ -34,15 +34,14 @@ func (u *userRepoImpl) Logout() error {
 	return nil
 }
 
-func (u *userRepoImpl) InsertNewAccount(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) (sqlc.SelectUserRow, error) {
+func (u *userRepoImpl) InsertNewAccount(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) error {
 	// user account add
 	err := u.q.InsertNewAccount(dbCtx, newAccount)
 	if err != nil {
-		return sqlc.SelectUserRow{}, err
+		return err
 	}
 
-	// get added account from db
-	return u.q.SelectUser(dbCtx, newAccount.Username)
+	return nil
 }
 
 func (u *userRepoImpl) DeleteAccount() error {

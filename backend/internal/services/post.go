@@ -24,8 +24,6 @@ type postServiceImpl struct {
 	postRepo repositories.PostRepository
 }
 
-const defaultDBTimeout = 5 * time.Second
-
 func NewPostService(repo repositories.PostRepository) PostService {
 	return &postServiceImpl{postRepo: repo}
 }

@@ -296,29 +296,20 @@ func (_c *MockUserRepository_DeleteAccount_Call) RunAndReturn(run func() error) 
 }
 
 // InsertNewAccount provides a mock function for the type MockUserRepository
-func (_mock *MockUserRepository) InsertNewAccount(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) (sqlc.SelectUserRow, error) {
+func (_mock *MockUserRepository) InsertNewAccount(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) error {
 	ret := _mock.Called(dbCtx, newAccount)
 
 	if len(ret) == 0 {
 		panic("no return value specified for InsertNewAccount")
 	}
 
-	var r0 sqlc.SelectUserRow
-	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, sqlc.InsertNewAccountParams) (sqlc.SelectUserRow, error)); ok {
-		return returnFunc(dbCtx, newAccount)
-	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, sqlc.InsertNewAccountParams) sqlc.SelectUserRow); ok {
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, sqlc.InsertNewAccountParams) error); ok {
 		r0 = returnFunc(dbCtx, newAccount)
 	} else {
-		r0 = ret.Get(0).(sqlc.SelectUserRow)
+		r0 = ret.Error(0)
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, sqlc.InsertNewAccountParams) error); ok {
-		r1 = returnFunc(dbCtx, newAccount)
-	} else {
-		r1 = ret.Error(1)
-	}
-	return r0, r1
+	return r0
 }
 
 // MockUserRepository_InsertNewAccount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'InsertNewAccount'
@@ -351,12 +342,12 @@ func (_c *MockUserRepository_InsertNewAccount_Call) Run(run func(dbCtx context.C
 	return _c
 }
 
-func (_c *MockUserRepository_InsertNewAccount_Call) Return(selectUserRow sqlc.SelectUserRow, err error) *MockUserRepository_InsertNewAccount_Call {
-	_c.Call.Return(selectUserRow, err)
+func (_c *MockUserRepository_InsertNewAccount_Call) Return(err error) *MockUserRepository_InsertNewAccount_Call {
+	_c.Call.Return(err)
 	return _c
 }
 
-func (_c *MockUserRepository_InsertNewAccount_Call) RunAndReturn(run func(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) (sqlc.SelectUserRow, error)) *MockUserRepository_InsertNewAccount_Call {
+func (_c *MockUserRepository_InsertNewAccount_Call) RunAndReturn(run func(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) error) *MockUserRepository_InsertNewAccount_Call {
 	_c.Call.Return(run)
 	return _c
 }

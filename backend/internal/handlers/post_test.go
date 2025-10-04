@@ -335,7 +335,7 @@ func TestCreatePost(t *testing.T) {
 
 			handler := handlers.NewPostHandler(mockSvc)
 			handler.CreatePost(c)
-
+			
 			if w.Code != tc.expectedStatus {
 				t.Errorf("expected status %d, got %d", tc.expectedStatus, w.Code)
 			}

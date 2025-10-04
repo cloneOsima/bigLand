@@ -158,22 +158,3 @@ func (q *Queries) SelectPosts(ctx context.Context) ([]SelectPostsRow, error) {
 	}
 	return items, nil
 }
-
-const selectUser = `-- name: SelectUser :one
-SELECT username, email, password_hash
-FROM users
-WHERE username = $1
-`
-
-type SelectUserRow struct {
-	Username     string
-	Email        string
-	PasswordHash string
-}
-
-func (q *Queries) SelectUser(ctx context.Context, username string) (SelectUserRow, error) {
-	row := q.db.QueryRow(ctx, selectUser, username)
-	var i SelectUserRow
-	err := row.Scan(&i.Username, &i.Email, &i.PasswordHash)
-	return i, err
-}

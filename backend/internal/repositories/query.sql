@@ -40,8 +40,3 @@ INSERT INTO users (
     $3,
     $4
 ); 
-
--- name: SelectUser :one
-SELECT username, email, password_hash
-FROM users
-WHERE username = $1;

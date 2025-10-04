@@ -253,16 +253,16 @@ func (_m *MockUserService) EXPECT() *MockUserService_Expecter {
 }
 
 // SignUp provides a mock function for the type MockUserService
-func (_mock *MockUserService) SignUp(ctx context.Context) error {
-	ret := _mock.Called(ctx)
+func (_mock *MockUserService) SignUp(ctx context.Context, data models.User) error {
+	ret := _mock.Called(ctx, data)
 
 	if len(ret) == 0 {
 		panic("no return value specified for SignUp")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context) error); ok {
-		r0 = returnFunc(ctx)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, models.User) error); ok {
+		r0 = returnFunc(ctx, data)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -276,18 +276,24 @@ type MockUserService_SignUp_Call struct {
 
 // SignUp is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *MockUserService_Expecter) SignUp(ctx interface{}) *MockUserService_SignUp_Call {
-	return &MockUserService_SignUp_Call{Call: _e.mock.On("SignUp", ctx)}
+//   - data models.User
+func (_e *MockUserService_Expecter) SignUp(ctx interface{}, data interface{}) *MockUserService_SignUp_Call {
+	return &MockUserService_SignUp_Call{Call: _e.mock.On("SignUp", ctx, data)}
 }
 
-func (_c *MockUserService_SignUp_Call) Run(run func(ctx context.Context)) *MockUserService_SignUp_Call {
+func (_c *MockUserService_SignUp_Call) Run(run func(ctx context.Context, data models.User)) *MockUserService_SignUp_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
+		var arg1 models.User
+		if args[1] != nil {
+			arg1 = args[1].(models.User)
+		}
 		run(
 			arg0,
+			arg1,
 		)
 	})
 	return _c
@@ -298,7 +304,7 @@ func (_c *MockUserService_SignUp_Call) Return(err error) *MockUserService_SignUp
 	return _c
 }
 
-func (_c *MockUserService_SignUp_Call) RunAndReturn(run func(ctx context.Context) error) *MockUserService_SignUp_Call {
+func (_c *MockUserService_SignUp_Call) RunAndReturn(run func(ctx context.Context, data models.User) error) *MockUserService_SignUp_Call {
 	_c.Call.Return(run)
 	return _c
 }
