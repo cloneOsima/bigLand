@@ -28,15 +28,4 @@ INSERT INTO posts (
     ST_SetSRID(ST_MakePoint($4, $3), 4326)
 );
 
--- name: InsertNewAccount :exec
-INSERT INTO users (
-    username,
-    email,
-    password_hash,
-    last_login_at
-) VALUES (
-    $1,
-    $2,
-    $3,
-    $4
-); 
+

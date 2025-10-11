@@ -8,6 +8,7 @@ import (
 	"github.com/cloneOsima/bigLand/backend/internal/mocks/repositories"
 	"github.com/cloneOsima/bigLand/backend/internal/models"
 	"github.com/cloneOsima/bigLand/backend/internal/services"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -46,6 +47,27 @@ func TestSignUp(t *testing.T) {
 			returnedErr: errors.New("empty username"),
 			flag:        false,
 		},
+		{
+			name:        "Error - Invalid email (empty value)",
+			inputData:   models.User{Username: inputData.Username, Email: "", Password: inputData.Password},
+			expectedErr: errors.New("empty email"),
+			returnedErr: errors.New("empty email"),
+			flag:        false,
+		},
+		{
+			name:        "Error - Invalid email (invalid value)",
+			inputData:   models.User{Username: inputData.Username, Email: "test@test", Password: inputData.Password},
+			expectedErr: errors.New("invalid email"),
+			returnedErr: errors.New("invalid email"),
+			flag:        false,
+		},
+		{
+			name:        "Error - Context timeout",
+			inputData:   models.User{Username: inputData.Username, Email: "test@test", Password: inputData.Password},
+			expectedErr: assert.AnError,
+			returnedErr: assert.AnError,
+			flag:        false,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -77,6 +99,8 @@ func TestSignUp(t *testing.T) {
 			}
 
 			if !tc.flag {
+
+				// AssertNotCalled는 mock 호출이 종료후, 해당 method의 호출 여부에 따라 테스트의 성공/실패를 확인함
 				repo.AssertNotCalled(t, "InsertNewAccount", mock.Anything, mock.Anything)
 			} else {
 				repo.AssertCalled(t, "InsertNewAccount", mock.Anything, mock.AnythingOfType("sqlc.InsertNewAccountParams"))

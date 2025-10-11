@@ -62,7 +62,11 @@ func signUpValidation(inputData models.User) error {
 		return errors.New("empty username")
 	}
 
-	if inputData.Email == "" || !utils.EmailRegex.MatchString(inputData.Email) {
+	if inputData.Email == "" {
+		return errors.New("empty email")
+	}
+
+	if !utils.EmailRegex.MatchString(inputData.Email) {
 		return errors.New("invalid email")
 	}
 
