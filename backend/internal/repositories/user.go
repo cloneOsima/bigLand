@@ -1,38 +1,50 @@
 package repositories
 
 import (
-	"github.com/cloneOsima/bigLand/backend/internal/models"
+	"context"
+
+	"github.com/cloneOsima/bigLand/backend/internal/sqlc"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type UserRepository interface {
-	Login()
-	Logout()
-	NewAccount()
-	DeleteAccount()
+	Login() error
+	Logout() error
+	InsertNewAccount(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) error
+	DeleteAccount() error
 }
 
-type User struct {
-	dbPool   *pgxpool.Pool
-	UserData models.User
+type userRepoImpl struct {
+	q *sqlc.Queries
 }
 
-func (u *User) Login() error {
+func NewUserRepository(pool *pgxpool.Pool) UserRepository {
+	return &userRepoImpl{
+		q: sqlc.New(pool),
+	}
+}
+
+func (u *userRepoImpl) Login() error {
 
 	return nil
 }
 
-func (u *User) Logout() error {
+func (u *userRepoImpl) Logout() error {
 
 	return nil
 }
 
-func (u *User) NewAccount() error {
+func (u *userRepoImpl) InsertNewAccount(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) error {
+	// user account add
+	err := u.q.InsertNewAccount(dbCtx, newAccount)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (u *User) DeleteAccount() error {
+func (u *userRepoImpl) DeleteAccount() error {
 
 	return nil
 }

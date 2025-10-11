@@ -39,16 +39,16 @@ func (_m *MockPostRepository) EXPECT() *MockPostRepository_Expecter {
 	return &MockPostRepository_Expecter{mock: &_m.Mock}
 }
 
-// CreatePost provides a mock function for the type MockPostRepository
-func (_mock *MockPostRepository) CreatePost(dbCtx context.Context, info sqlc.CreatePostParams) error {
+// InsertNewPost provides a mock function for the type MockPostRepository
+func (_mock *MockPostRepository) InsertNewPost(dbCtx context.Context, info sqlc.InsertNewPostParams) error {
 	ret := _mock.Called(dbCtx, info)
 
 	if len(ret) == 0 {
-		panic("no return value specified for CreatePost")
+		panic("no return value specified for InsertNewPost")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, sqlc.CreatePostParams) error); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, sqlc.InsertNewPostParams) error); ok {
 		r0 = returnFunc(dbCtx, info)
 	} else {
 		r0 = ret.Error(0)
@@ -56,27 +56,27 @@ func (_mock *MockPostRepository) CreatePost(dbCtx context.Context, info sqlc.Cre
 	return r0
 }
 
-// MockPostRepository_CreatePost_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreatePost'
-type MockPostRepository_CreatePost_Call struct {
+// MockPostRepository_InsertNewPost_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'InsertNewPost'
+type MockPostRepository_InsertNewPost_Call struct {
 	*mock.Call
 }
 
-// CreatePost is a helper method to define mock.On call
+// InsertNewPost is a helper method to define mock.On call
 //   - dbCtx context.Context
-//   - info sqlc.CreatePostParams
-func (_e *MockPostRepository_Expecter) CreatePost(dbCtx interface{}, info interface{}) *MockPostRepository_CreatePost_Call {
-	return &MockPostRepository_CreatePost_Call{Call: _e.mock.On("CreatePost", dbCtx, info)}
+//   - info sqlc.InsertNewPostParams
+func (_e *MockPostRepository_Expecter) InsertNewPost(dbCtx interface{}, info interface{}) *MockPostRepository_InsertNewPost_Call {
+	return &MockPostRepository_InsertNewPost_Call{Call: _e.mock.On("InsertNewPost", dbCtx, info)}
 }
 
-func (_c *MockPostRepository_CreatePost_Call) Run(run func(dbCtx context.Context, info sqlc.CreatePostParams)) *MockPostRepository_CreatePost_Call {
+func (_c *MockPostRepository_InsertNewPost_Call) Run(run func(dbCtx context.Context, info sqlc.InsertNewPostParams)) *MockPostRepository_InsertNewPost_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 sqlc.CreatePostParams
+		var arg1 sqlc.InsertNewPostParams
 		if args[1] != nil {
-			arg1 = args[1].(sqlc.CreatePostParams)
+			arg1 = args[1].(sqlc.InsertNewPostParams)
 		}
 		run(
 			arg0,
@@ -86,33 +86,33 @@ func (_c *MockPostRepository_CreatePost_Call) Run(run func(dbCtx context.Context
 	return _c
 }
 
-func (_c *MockPostRepository_CreatePost_Call) Return(err error) *MockPostRepository_CreatePost_Call {
+func (_c *MockPostRepository_InsertNewPost_Call) Return(err error) *MockPostRepository_InsertNewPost_Call {
 	_c.Call.Return(err)
 	return _c
 }
 
-func (_c *MockPostRepository_CreatePost_Call) RunAndReturn(run func(dbCtx context.Context, info sqlc.CreatePostParams) error) *MockPostRepository_CreatePost_Call {
+func (_c *MockPostRepository_InsertNewPost_Call) RunAndReturn(run func(dbCtx context.Context, info sqlc.InsertNewPostParams) error) *MockPostRepository_InsertNewPost_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// GetPostInfo provides a mock function for the type MockPostRepository
-func (_mock *MockPostRepository) GetPostInfo(ctx context.Context, postID uuid.UUID) (sqlc.GetPostInfoRow, error) {
+// SelectPostInfo provides a mock function for the type MockPostRepository
+func (_mock *MockPostRepository) SelectPostInfo(ctx context.Context, postID uuid.UUID) (sqlc.SelectPostInfoRow, error) {
 	ret := _mock.Called(ctx, postID)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetPostInfo")
+		panic("no return value specified for SelectPostInfo")
 	}
 
-	var r0 sqlc.GetPostInfoRow
+	var r0 sqlc.SelectPostInfoRow
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) (sqlc.GetPostInfoRow, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) (sqlc.SelectPostInfoRow, error)); ok {
 		return returnFunc(ctx, postID)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) sqlc.GetPostInfoRow); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, uuid.UUID) sqlc.SelectPostInfoRow); ok {
 		r0 = returnFunc(ctx, postID)
 	} else {
-		r0 = ret.Get(0).(sqlc.GetPostInfoRow)
+		r0 = ret.Get(0).(sqlc.SelectPostInfoRow)
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
 		r1 = returnFunc(ctx, postID)
@@ -122,19 +122,19 @@ func (_mock *MockPostRepository) GetPostInfo(ctx context.Context, postID uuid.UU
 	return r0, r1
 }
 
-// MockPostRepository_GetPostInfo_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPostInfo'
-type MockPostRepository_GetPostInfo_Call struct {
+// MockPostRepository_SelectPostInfo_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SelectPostInfo'
+type MockPostRepository_SelectPostInfo_Call struct {
 	*mock.Call
 }
 
-// GetPostInfo is a helper method to define mock.On call
+// SelectPostInfo is a helper method to define mock.On call
 //   - ctx context.Context
 //   - postID uuid.UUID
-func (_e *MockPostRepository_Expecter) GetPostInfo(ctx interface{}, postID interface{}) *MockPostRepository_GetPostInfo_Call {
-	return &MockPostRepository_GetPostInfo_Call{Call: _e.mock.On("GetPostInfo", ctx, postID)}
+func (_e *MockPostRepository_Expecter) SelectPostInfo(ctx interface{}, postID interface{}) *MockPostRepository_SelectPostInfo_Call {
+	return &MockPostRepository_SelectPostInfo_Call{Call: _e.mock.On("SelectPostInfo", ctx, postID)}
 }
 
-func (_c *MockPostRepository_GetPostInfo_Call) Run(run func(ctx context.Context, postID uuid.UUID)) *MockPostRepository_GetPostInfo_Call {
+func (_c *MockPostRepository_SelectPostInfo_Call) Run(run func(ctx context.Context, postID uuid.UUID)) *MockPostRepository_SelectPostInfo_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -152,34 +152,34 @@ func (_c *MockPostRepository_GetPostInfo_Call) Run(run func(ctx context.Context,
 	return _c
 }
 
-func (_c *MockPostRepository_GetPostInfo_Call) Return(getPostInfoRow sqlc.GetPostInfoRow, err error) *MockPostRepository_GetPostInfo_Call {
-	_c.Call.Return(getPostInfoRow, err)
+func (_c *MockPostRepository_SelectPostInfo_Call) Return(selectPostInfoRow sqlc.SelectPostInfoRow, err error) *MockPostRepository_SelectPostInfo_Call {
+	_c.Call.Return(selectPostInfoRow, err)
 	return _c
 }
 
-func (_c *MockPostRepository_GetPostInfo_Call) RunAndReturn(run func(ctx context.Context, postID uuid.UUID) (sqlc.GetPostInfoRow, error)) *MockPostRepository_GetPostInfo_Call {
+func (_c *MockPostRepository_SelectPostInfo_Call) RunAndReturn(run func(ctx context.Context, postID uuid.UUID) (sqlc.SelectPostInfoRow, error)) *MockPostRepository_SelectPostInfo_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// GetPosts provides a mock function for the type MockPostRepository
-func (_mock *MockPostRepository) GetPosts(ctx context.Context) ([]sqlc.GetPostsRow, error) {
+// SelectPosts provides a mock function for the type MockPostRepository
+func (_mock *MockPostRepository) SelectPosts(ctx context.Context) ([]sqlc.SelectPostsRow, error) {
 	ret := _mock.Called(ctx)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetPosts")
+		panic("no return value specified for SelectPosts")
 	}
 
-	var r0 []sqlc.GetPostsRow
+	var r0 []sqlc.SelectPostsRow
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context) ([]sqlc.GetPostsRow, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context) ([]sqlc.SelectPostsRow, error)); ok {
 		return returnFunc(ctx)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context) []sqlc.GetPostsRow); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context) []sqlc.SelectPostsRow); ok {
 		r0 = returnFunc(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]sqlc.GetPostsRow)
+			r0 = ret.Get(0).([]sqlc.SelectPostsRow)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
@@ -190,18 +190,18 @@ func (_mock *MockPostRepository) GetPosts(ctx context.Context) ([]sqlc.GetPostsR
 	return r0, r1
 }
 
-// MockPostRepository_GetPosts_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPosts'
-type MockPostRepository_GetPosts_Call struct {
+// MockPostRepository_SelectPosts_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SelectPosts'
+type MockPostRepository_SelectPosts_Call struct {
 	*mock.Call
 }
 
-// GetPosts is a helper method to define mock.On call
+// SelectPosts is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *MockPostRepository_Expecter) GetPosts(ctx interface{}) *MockPostRepository_GetPosts_Call {
-	return &MockPostRepository_GetPosts_Call{Call: _e.mock.On("GetPosts", ctx)}
+func (_e *MockPostRepository_Expecter) SelectPosts(ctx interface{}) *MockPostRepository_SelectPosts_Call {
+	return &MockPostRepository_SelectPosts_Call{Call: _e.mock.On("SelectPosts", ctx)}
 }
 
-func (_c *MockPostRepository_GetPosts_Call) Run(run func(ctx context.Context)) *MockPostRepository_GetPosts_Call {
+func (_c *MockPostRepository_SelectPosts_Call) Run(run func(ctx context.Context)) *MockPostRepository_SelectPosts_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -214,12 +214,12 @@ func (_c *MockPostRepository_GetPosts_Call) Run(run func(ctx context.Context)) *
 	return _c
 }
 
-func (_c *MockPostRepository_GetPosts_Call) Return(getPostsRows []sqlc.GetPostsRow, err error) *MockPostRepository_GetPosts_Call {
-	_c.Call.Return(getPostsRows, err)
+func (_c *MockPostRepository_SelectPosts_Call) Return(selectPostsRows []sqlc.SelectPostsRow, err error) *MockPostRepository_SelectPosts_Call {
+	_c.Call.Return(selectPostsRows, err)
 	return _c
 }
 
-func (_c *MockPostRepository_GetPosts_Call) RunAndReturn(run func(ctx context.Context) ([]sqlc.GetPostsRow, error)) *MockPostRepository_GetPosts_Call {
+func (_c *MockPostRepository_SelectPosts_Call) RunAndReturn(run func(ctx context.Context) ([]sqlc.SelectPostsRow, error)) *MockPostRepository_SelectPosts_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -252,9 +252,20 @@ func (_m *MockUserRepository) EXPECT() *MockUserRepository_Expecter {
 }
 
 // DeleteAccount provides a mock function for the type MockUserRepository
-func (_mock *MockUserRepository) DeleteAccount() {
-	_mock.Called()
-	return
+func (_mock *MockUserRepository) DeleteAccount() error {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteAccount")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func() error); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
 }
 
 // MockUserRepository_DeleteAccount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteAccount'
@@ -274,20 +285,88 @@ func (_c *MockUserRepository_DeleteAccount_Call) Run(run func()) *MockUserReposi
 	return _c
 }
 
-func (_c *MockUserRepository_DeleteAccount_Call) Return() *MockUserRepository_DeleteAccount_Call {
-	_c.Call.Return()
+func (_c *MockUserRepository_DeleteAccount_Call) Return(err error) *MockUserRepository_DeleteAccount_Call {
+	_c.Call.Return(err)
 	return _c
 }
 
-func (_c *MockUserRepository_DeleteAccount_Call) RunAndReturn(run func()) *MockUserRepository_DeleteAccount_Call {
-	_c.Run(run)
+func (_c *MockUserRepository_DeleteAccount_Call) RunAndReturn(run func() error) *MockUserRepository_DeleteAccount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// InsertNewAccount provides a mock function for the type MockUserRepository
+func (_mock *MockUserRepository) InsertNewAccount(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) error {
+	ret := _mock.Called(dbCtx, newAccount)
+
+	if len(ret) == 0 {
+		panic("no return value specified for InsertNewAccount")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, sqlc.InsertNewAccountParams) error); ok {
+		r0 = returnFunc(dbCtx, newAccount)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockUserRepository_InsertNewAccount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'InsertNewAccount'
+type MockUserRepository_InsertNewAccount_Call struct {
+	*mock.Call
+}
+
+// InsertNewAccount is a helper method to define mock.On call
+//   - dbCtx context.Context
+//   - newAccount sqlc.InsertNewAccountParams
+func (_e *MockUserRepository_Expecter) InsertNewAccount(dbCtx interface{}, newAccount interface{}) *MockUserRepository_InsertNewAccount_Call {
+	return &MockUserRepository_InsertNewAccount_Call{Call: _e.mock.On("InsertNewAccount", dbCtx, newAccount)}
+}
+
+func (_c *MockUserRepository_InsertNewAccount_Call) Run(run func(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams)) *MockUserRepository_InsertNewAccount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 sqlc.InsertNewAccountParams
+		if args[1] != nil {
+			arg1 = args[1].(sqlc.InsertNewAccountParams)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockUserRepository_InsertNewAccount_Call) Return(err error) *MockUserRepository_InsertNewAccount_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockUserRepository_InsertNewAccount_Call) RunAndReturn(run func(dbCtx context.Context, newAccount sqlc.InsertNewAccountParams) error) *MockUserRepository_InsertNewAccount_Call {
+	_c.Call.Return(run)
 	return _c
 }
 
 // Login provides a mock function for the type MockUserRepository
-func (_mock *MockUserRepository) Login() {
-	_mock.Called()
-	return
+func (_mock *MockUserRepository) Login() error {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Login")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func() error); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
 }
 
 // MockUserRepository_Login_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Login'
@@ -307,20 +386,31 @@ func (_c *MockUserRepository_Login_Call) Run(run func()) *MockUserRepository_Log
 	return _c
 }
 
-func (_c *MockUserRepository_Login_Call) Return() *MockUserRepository_Login_Call {
-	_c.Call.Return()
+func (_c *MockUserRepository_Login_Call) Return(err error) *MockUserRepository_Login_Call {
+	_c.Call.Return(err)
 	return _c
 }
 
-func (_c *MockUserRepository_Login_Call) RunAndReturn(run func()) *MockUserRepository_Login_Call {
-	_c.Run(run)
+func (_c *MockUserRepository_Login_Call) RunAndReturn(run func() error) *MockUserRepository_Login_Call {
+	_c.Call.Return(run)
 	return _c
 }
 
 // Logout provides a mock function for the type MockUserRepository
-func (_mock *MockUserRepository) Logout() {
-	_mock.Called()
-	return
+func (_mock *MockUserRepository) Logout() error {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Logout")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func() error); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
 }
 
 // MockUserRepository_Logout_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Logout'
@@ -340,45 +430,12 @@ func (_c *MockUserRepository_Logout_Call) Run(run func()) *MockUserRepository_Lo
 	return _c
 }
 
-func (_c *MockUserRepository_Logout_Call) Return() *MockUserRepository_Logout_Call {
-	_c.Call.Return()
+func (_c *MockUserRepository_Logout_Call) Return(err error) *MockUserRepository_Logout_Call {
+	_c.Call.Return(err)
 	return _c
 }
 
-func (_c *MockUserRepository_Logout_Call) RunAndReturn(run func()) *MockUserRepository_Logout_Call {
-	_c.Run(run)
-	return _c
-}
-
-// NewAccount provides a mock function for the type MockUserRepository
-func (_mock *MockUserRepository) NewAccount() {
-	_mock.Called()
-	return
-}
-
-// MockUserRepository_NewAccount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'NewAccount'
-type MockUserRepository_NewAccount_Call struct {
-	*mock.Call
-}
-
-// NewAccount is a helper method to define mock.On call
-func (_e *MockUserRepository_Expecter) NewAccount() *MockUserRepository_NewAccount_Call {
-	return &MockUserRepository_NewAccount_Call{Call: _e.mock.On("NewAccount")}
-}
-
-func (_c *MockUserRepository_NewAccount_Call) Run(run func()) *MockUserRepository_NewAccount_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run()
-	})
-	return _c
-}
-
-func (_c *MockUserRepository_NewAccount_Call) Return() *MockUserRepository_NewAccount_Call {
-	_c.Call.Return()
-	return _c
-}
-
-func (_c *MockUserRepository_NewAccount_Call) RunAndReturn(run func()) *MockUserRepository_NewAccount_Call {
-	_c.Run(run)
+func (_c *MockUserRepository_Logout_Call) RunAndReturn(run func() error) *MockUserRepository_Logout_Call {
+	_c.Call.Return(run)
 	return _c
 }

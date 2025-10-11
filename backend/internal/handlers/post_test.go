@@ -323,7 +323,7 @@ func TestCreatePost(t *testing.T) {
 			t.Parallel()
 
 			mockSvc := services.NewMockPostService(t)
-			mockSvc.On("CreatePost", mock.Anything, mock.AnythingOfType("*models.Post")).Return(tc.returnErr)
+			mockSvc.On("NewPost", mock.Anything, mock.AnythingOfType("*models.Post")).Return(tc.returnErr)
 
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
@@ -335,7 +335,7 @@ func TestCreatePost(t *testing.T) {
 
 			handler := handlers.NewPostHandler(mockSvc)
 			handler.CreatePost(c)
-
+			
 			if w.Code != tc.expectedStatus {
 				t.Errorf("expected status %d, got %d", tc.expectedStatus, w.Code)
 			}

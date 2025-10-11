@@ -6,7 +6,7 @@ cloud:
 servers: []
 sql:                
   - engine: "postgresql"        
-    queries: "./internal/repositories/query.sql"
+    queries: "./internal/repositories/sql/"
     schema: "./internal/repositories/schema.sql"
     gen:
       go:                       

@@ -11,9 +11,9 @@ import (
 )
 
 type PostRepository interface {
-	GetPosts(ctx context.Context) ([]sqlc.GetPostsRow, error)
-	GetPostInfo(ctx context.Context, postID uuid.UUID) (sqlc.GetPostInfoRow, error)
-	CreatePost(dbCtx context.Context, info sqlc.CreatePostParams) error
+	SelectPosts(ctx context.Context) ([]sqlc.SelectPostsRow, error)
+	SelectPostInfo(ctx context.Context, postID uuid.UUID) (sqlc.SelectPostInfoRow, error)
+	InsertNewPost(dbCtx context.Context, info sqlc.InsertNewPostParams) error
 }
 
 type postRepoImpl struct {
@@ -26,16 +26,17 @@ func NewPostRepository(pool *pgxpool.Pool) PostRepository {
 	}
 }
 
-func (p *postRepoImpl) GetPosts(dbCtx context.Context) ([]sqlc.GetPostsRow, error) {
-	return p.q.GetPosts(dbCtx)
+// 성능 문제 시 리턴을 pointer로 변경할 것.
+func (p *postRepoImpl) SelectPosts(dbCtx context.Context) ([]sqlc.SelectPostsRow, error) {
+	return p.q.SelectPosts(dbCtx)
 }
 
-func (p *postRepoImpl) GetPostInfo(dbCtx context.Context, postID uuid.UUID) (sqlc.GetPostInfoRow, error) {
-	return p.q.GetPostInfo(dbCtx, postID)
+func (p *postRepoImpl) SelectPostInfo(dbCtx context.Context, postID uuid.UUID) (sqlc.SelectPostInfoRow, error) {
+	return p.q.SelectPostInfo(dbCtx, postID)
 }
 
-func (p *postRepoImpl) CreatePost(dbCtx context.Context, info sqlc.CreatePostParams) error {
-	return p.q.CreatePost(dbCtx, info)
+func (p *postRepoImpl) InsertNewPost(dbCtx context.Context, info sqlc.InsertNewPostParams) error {
+	return p.q.InsertNewPost(dbCtx, info)
 }
 
 // type PostRepository interface {
