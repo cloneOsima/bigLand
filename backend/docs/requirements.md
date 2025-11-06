@@ -5,8 +5,8 @@
 - comment
 - delete post (admin)       
 - delete comment (admin)
-- create a new account      : in progress
-- user login
+- create a new account      : fin
+- user login                : in progress
 
 ## DDL for creating table 
 ```
